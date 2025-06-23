@@ -46,6 +46,26 @@ namespace LegacyBookingCoordinator
             return (T)Activator.CreateInstance(type, args)!;
         }
 
+        public I Create<I, T>(params object[] args) where T : class, I
+        {
+            var interfaceType = typeof(I);
+            
+            // Check queued objects first (SetOne)
+            if (_queuedObjects.ContainsKey(interfaceType) && _queuedObjects[interfaceType].Count > 0)
+            {
+                return (I)_queuedObjects[interfaceType].Dequeue();
+            }
+            
+            // Then check always objects (SetAlways)
+            if (_alwaysObjects.ContainsKey(interfaceType))
+            {
+                return (I)_alwaysObjects[interfaceType];
+            }
+            
+            // Default: create concrete implementation
+            return (T)Activator.CreateInstance(typeof(T), args)!;
+        }
+
         public void SetOne<T>(T obj)
         {
             var type = typeof(T);

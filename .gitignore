@@ -1,0 +1,22 @@
+# Build Outputs
+bin/
+obj/
+
+# IDE Files
+.idea/
+.vs/
+*.user
+*.suo
+*.sln.DotSettings.user
+
+# Verify Test Files
+*.received.*
+*.verified.*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Package Management
+packages/
+.nuget/

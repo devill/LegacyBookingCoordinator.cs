@@ -1,3 +1,4 @@
+using System.Text;
 using LegacyBookingCoordinator;
 
 namespace LegacyBookingCoordinator.Tests
@@ -5,9 +6,11 @@ namespace LegacyBookingCoordinator.Tests
     public class BookingCoordinatorTests
     {
         [Fact]
-        public void BookFlight_ShouldCreateBookingSuccessfully()
+        public async Task BookFlight_ShouldCreateBookingSuccessfully()
         {
             // Arrange
+            var storybook = new StringBuilder();
+            
             var coordinator = new BookingCoordinator();
             var passengerName = "John Doe";
             var flightNumber = "AA123";
@@ -18,6 +21,9 @@ namespace LegacyBookingCoordinator.Tests
             
             coordinator.BookFlight(passengerName, flightNumber, departureDate, 
                 passengerCount, airlineCode, specialRequests);
+            
+            // Assert
+            await Verify(storybook.ToString());
         }
 
     }

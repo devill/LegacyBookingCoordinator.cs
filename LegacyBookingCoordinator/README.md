@@ -21,11 +21,17 @@ var logger = new AuditLogger(logDirectory, verboseMode);
 var logger = god.Create<AuditLogger>(logDirectory, verboseMode);
 ```
 
+Or for classes with interfaces:
+```csharp
+var logger = god.Create<IAuditLogger, AuditLogger>(logDirectory, verboseMode);
+```
+
 In tests, you can override what gets created:
 ```csharp
 var god = GlobalObjectDispatcher.Instance();
-god.SetAlways<AuditLogger>(new FakeAuditLogger());  // Always return this fake
-god.SetOne<PricingEngine>(new FakePricingEngine()); // Return this fake once, then normal creation
+god.SetAlways<AuditLogger>(new FakeAuditLogger());     // For concrete types
+god.SetAlways<IAuditLogger>(new FakeAuditLogger());    // For interface types  
+god.SetOne<PricingEngine>(new FakePricingEngine());    // Return this fake once, then normal creation
 ```
 
 **Important**: All tests that set objects on the `GlobalObjectDispatcher` should call `GlobalObjectDispatcher.Instance().ClearAll()` to make sure tests remain independent. 

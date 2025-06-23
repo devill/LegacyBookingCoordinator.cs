@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LegacyBookingCoordinator
 {
-    public class BookingRepository
+    public class BookingRepository : IBookingRepository
     {
         private readonly string connectionString; 
         private readonly int retryCount;

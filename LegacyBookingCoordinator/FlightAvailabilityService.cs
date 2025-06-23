@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LegacyBookingCoordinator
 {
-    public class FlightAvailabilityService
+    public class FlightAvailabilityService : IFlightAvailabilityService
     {
         private readonly string airlineApiConfig;
         

@@ -2,7 +2,7 @@ using System;
 
 namespace LegacyBookingCoordinator
 {
-    public class AuditLogger
+    public class AuditLogger : IAuditLogger
     {
         private readonly string filePath;
         private readonly bool enableConsoleOutput;

@@ -2,7 +2,7 @@ using System;
 
 namespace LegacyBookingCoordinator
 {
-    public class PartnerNotifier
+    public class PartnerNotifier : IPartnerNotifier
     {
         private readonly string logDestination;
         private readonly bool enableSecureMode;

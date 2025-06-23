@@ -1,0 +1,14 @@
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/bin/Debug/net8.0/LegacyBookingCoordinator
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/bin/Debug/net8.0/LegacyBookingCoordinator.deps.json
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/bin/Debug/net8.0/LegacyBookingCoordinator.runtimeconfig.json
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/bin/Debug/net8.0/LegacyBookingCoordinator.dll
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/bin/Debug/net8.0/LegacyBookingCoordinator.pdb
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/LegacyBookingCoordinator.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/LegacyBookingCoordinator.AssemblyInfoInputs.cache
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/LegacyBookingCoordinator.AssemblyInfo.cs
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/LegacyBookingCoordinator.csproj.CoreCompileInputs.cache
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/LegacyBookingCoordinator.dll
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/refint/LegacyBookingCoordinator.dll
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/LegacyBookingCoordinator.pdb
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/LegacyBookingCoordinator.genruntimeconfig.cache
+/Users/ivett/Documents/git/LegacyBookingCoordinator/LegacyBookingCoordinator/obj/Debug/net8.0/ref/LegacyBookingCoordinator.dll

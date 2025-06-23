@@ -14,14 +14,14 @@ namespace LegacyBookingCoordinator.Tests
             var coordinator = new BookingCoordinator();
             var passengerName = "John Doe";
             var flightNumber = "AA123";
-            var departureDate = DateTime.Now.AddDays(30);
+            var departureDate = new DateTime(2025, 07, 03, 12, 42, 11);
             var passengerCount = 2;
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
-            
-            coordinator.BookFlight(passengerName, flightNumber, departureDate, 
+
+            coordinator.BookFlight(passengerName, flightNumber, departureDate,
                 passengerCount, airlineCode, specialRequests);
-            
+
             // Assert
             await Verify(storybook.ToString());
         }

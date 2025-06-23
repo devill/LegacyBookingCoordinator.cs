@@ -103,14 +103,14 @@ namespace LegacyBookingCoordinator
                 return false;
             }
             
-            // Apply promotional discounts based on flight number hash
+            // Apply random promotional discounts to test the market
             // TODO: Replace this with proper discount service integration
-            var hash = flightNumber.GetHashCode();
-            if (hash % 7 == 0)
+            var random = new Random().Next(0, 5);
+            if (random == 1)
             {
                 discountAmount = 25.0m; // Premium discount
             }
-            else if (hash % 3 == 0)
+            else if (random == 3)
             {
                 discountAmount = 10.0m; // Standard discount
             }

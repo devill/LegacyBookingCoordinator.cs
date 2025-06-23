@@ -53,13 +53,29 @@ namespace LegacyBookingCoordinator
             // Check queued objects first (SetOne)
             if (_queuedObjects.ContainsKey(interfaceType) && _queuedObjects[interfaceType].Count > 0)
             {
-                return (I)_queuedObjects[interfaceType].Dequeue();
+                var queuedObj = (I)_queuedObjects[interfaceType].Dequeue();
+                
+                // If the queued object implements IConstructorCalledWith, call it with constructor args
+                if (queuedObj is IConstructorCalledWith constructorLogger)
+                {
+                    constructorLogger.ConstructorCalledWith(args);
+                }
+                
+                return queuedObj;
             }
             
             // Then check always objects (SetAlways)
             if (_alwaysObjects.ContainsKey(interfaceType))
             {
-                return (I)_alwaysObjects[interfaceType];
+                var alwaysObj = (I)_alwaysObjects[interfaceType];
+                
+                // If always object implements IConstructorCalledWith, call it with constructor args
+                if (alwaysObj is IConstructorCalledWith constructorLogger)
+                {
+                    constructorLogger.ConstructorCalledWith(args);
+                }
+                
+                return alwaysObj;
             }
             
             // Default: create concrete implementation

@@ -3,9 +3,11 @@
 
 # 🎯 Objective:
 
-Use the `GlobalObjectDispatcher` pattern to introduce testability into an entangled legacy system responsible for managing flight bookings, pricing, and external integrations.
+Use the `GlobalObjectDispatcher` and `CallLogger` patterns to introduce testability into an entangled legacy system responsible for managing flight bookings, pricing, and external integrations.
 
-## What is the GlobalObjectDispatcher?
+## Concepts
+
+### GlobalObjectDispatcher
 
 Did you ever run into a codebase so awkward and full of hard to override dependencies that even the thought of writing a test is daunting? 
 
@@ -34,13 +36,53 @@ god.SetAlways<IAuditLogger>(new FakeAuditLogger());    // For interface types
 god.SetOne<PricingEngine>(new FakePricingEngine());    // Return this fake once, then normal creation
 ```
 
-**Important**: All tests that set objects on the `GlobalObjectDispatcher` should call `GlobalObjectDispatcher.Instance().ClearAll()` to make sure tests remain independent. 
+If you want to test constructor arguments make sure your test double implements `IConstructorCalledWith`. If it does the `ConstructorCalledWith` method will get called with the constructor arguments upon object creation.
 
-### Fair Warning
+**Important**: All tests that set objects on the `GlobalObjectDispatcher` should call `GlobalObjectDispatcher.Instance().ClearAll()` to make sure tests remain independent.
 
-While this is an incredibly useful pattern to get your first tests running in a hairy codebase, **avoid over reliance** on it. Since it relies on global state it can become tedious to work with. 
+#### Fair Warning ⚠️
+
+While this is an incredibly useful pattern to get your first tests running in a hairy codebase, **avoid over reliance** on it. Since it uses global state it can become tedious to work with. 
 
 Ideally once your code is under test, you can refactor to a state where injecting dependencies is done via the constructor. 
+
+### CallLogger
+
+Now that you can inject dependencies you have another problem: how do you implement test doubles and end up with an easy-to-read test?
+
+The CallLogger takes a StringBuilder and appends a formatted log for your call. This way you just need to verify the collected calls at the end of the test.
+
+Example:
+```csharp
+class TestDoubleFake : ISomeService, IConstructorCalledWith
+{
+    private readonly CallLogger _callLogger;
+
+    public TestDoubleFake(StringBuilder storybook)
+    {
+        _callLogger = new CallLogger(storybook, "📝");
+    }
+    
+    public string DoSomething(int count, string name)
+    {
+        var result = "success";
+        _callLogger
+            .withArgument(count, "count")
+            .withArgument(name, "name")
+            .withReturn(result)
+            .log();
+        return result;
+    }
+
+    public void ConstructorCalledWith(params object[] args)
+    {
+        _callLogger
+            .withArgument((string)args[0], "connectionString")
+            .withArgument((int)args[1], "timeout")
+            .log();
+    }
+}
+```
 
 ## 💼 Business Context:
 
@@ -68,7 +110,7 @@ The booking system coordinates:
 
 Write a test for `BookingCoordinator.BookFlight()` that:
 
-* Asserts a notification was sent.
+* Asserts a notification was sent to the correct place.
 * Asserts the correct price calculation.
 * Verifies logging occurred.
 * All *without touching real files or the console output*.
@@ -80,3 +122,4 @@ Then write a test using:
 ```csharp
 god.SetAlways<AuditLogger>(new FakeAuditLogger());
 ```
+

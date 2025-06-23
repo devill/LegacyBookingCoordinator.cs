@@ -1,13 +1,40 @@
 
-# 🧩 Code Kata: *Legacy Flight Booking System Refactor*
+# Code Kata: *Legacy Flight Booking System Testing*
 
-### 🎯 Objective:
+# 🎯 Objective:
 
 Use the `GlobalObjectDispatcher` pattern to introduce testability into an entangled legacy system responsible for managing flight bookings, pricing, and external integrations.
 
-#### What is the GlobalObjectDispatcher?
+## What is the GlobalObjectDispatcher?
 
-**TODO:** this section needs to be written.
+Did you ever run into a codebase so awkward and full of hard to override dependencies that even the thought of writing a test is daunting? 
+
+The `GlobalObjectDispatcher` is meant to solve this problem. It is a simple class that acts as a drop-in replacement for the `new` keyword, allowing you to control object creation in tests.
+
+**Instead of:**
+```csharp
+var logger = new AuditLogger(logDirectory, verboseMode);
+```
+
+**Use:**
+```csharp
+var logger = god.Create<AuditLogger>(logDirectory, verboseMode);
+```
+
+In tests, you can override what gets created:
+```csharp
+var god = GlobalObjectDispatcher.Instance();
+god.SetAlways<AuditLogger>(new FakeAuditLogger());  // Always return this fake
+god.SetOne<PricingEngine>(new FakePricingEngine()); // Return this fake once, then normal creation
+```
+
+**Important**: All tests that set objects on the `GlobalObjectDispatcher` should call `GlobalObjectDispatcher.Instance().ClearAll()` to make sure tests remain independent. 
+
+### Fair Warning
+
+While this is an incredibly useful pattern to get your first tests running in a hairy codebase, **avoid over reliance** on it. Since it relies on global state it can become tedious to work with. 
+
+Ideally once your code is under test, you can refactor to a state where injecting dependencies is done via the constructor. 
 
 ## 💼 Business Context:
 
@@ -25,11 +52,11 @@ Your company maintains a **legacy monolithic flight booking system**, originally
 The booking system coordinates:
 
 1. **FlightAvailabilityService**: Queries seat availability.
-2. **PricingEngine**: Applies dynamic pricing rules based on time, demand, and random airline quirks. Mostly takes care of price calculation apart from the occasional REST API call, and some parts of the calculation that leaked out into the BookingCoordinator.
-3. **PartnerNotifier**: Notifies airlines about confirmed bookings. Needs to be called with different set of arguments depending on the airline. The logic for this is implemented as a contrived set of if else and switch statements with some duplication here and there.
+2. **PricingEngine**: Applies dynamic pricing rules based on time, demand, and airline quirks.
+3. **PartnerNotifier**: Notifies airlines about confirmed bookings with airline-specific formatting.
 4. **AuditLogger**: Writes booking activity logs to disk.
-5. **BookingRepository**: Saves booking data to a proprietary database for which the licence is so expensive, we only have it in production.
-6. **BookingCoordinator**: The class that ties it all together, has zero tests, and lots of mutation, and object creation based on fields calculated inside the function before instantiation.
+5. **BookingRepository**: Saves booking data to a proprietary database (only available in production).
+6. **BookingCoordinator**: The main orchestrator that coordinates all the services.
 
 ## 🧪 Test Challenge
 

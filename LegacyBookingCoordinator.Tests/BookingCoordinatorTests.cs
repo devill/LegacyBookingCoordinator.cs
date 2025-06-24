@@ -129,7 +129,7 @@ namespace LegacyBookingCoordinator.Tests
         }
     }
 
-    public class BookingRepositoryStub : IBookingRepository
+    public class BookingRepositoryStub : IBookingRepository, IConstructorCalledWith
     {
         public string SaveBookingDetails(string passengerName, string flightDetails, decimal price, DateTime bookingDate)
         {

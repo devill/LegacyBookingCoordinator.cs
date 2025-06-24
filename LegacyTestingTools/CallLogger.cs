@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -135,6 +134,16 @@ namespace LegacyTestingTools
 
         public void ConstructorCalledWith(params object[] args)
         {
+            // Set up context for the target to specify constructor argument names
+            CallLogFormatterContext.SetCurrentLogger(new CallLogger(_logger._storybook, _emoji));
+            CallLogFormatterContext.SetCurrentMethodName("ConstructorCalledWith");
+            
+            // Call the target's ConstructorCalledWith method to let it set argument names
+            if (_target is IConstructorCalledWith constructorTarget)
+            {
+                constructorTarget.ConstructorCalledWith(args);
+            }
+            
             // Log constructor call directly with proper interface name
             var interfaceName = _interfaceName ?? typeof(T).Name;
             if (interfaceName.StartsWith("I") && interfaceName.Length > 1)
@@ -166,6 +175,9 @@ namespace LegacyTestingTools
             }
             
             callLogger.log("ConstructorCalledWith");
+            
+            // Clear context
+            CallLogFormatterContext.ClearCurrentLogger();
         }
 
 
@@ -305,11 +317,6 @@ namespace LegacyTestingTools
             return CallLoggerProxy<T>.Create(target, this, emoji);
         }
 
-        public T WrapClass<T>(T target, string emoji = "🔧") where T : class
-        {
-            return CallLoggerProxy<T>.Create(target, this, emoji);
-        }
-
         public CallLogger withReturn(object? returnValue, string? description = null)
         {
             _returnValue = returnValue;
@@ -400,28 +407,6 @@ namespace LegacyTestingTools
             _storybook.AppendLine();
         }
 
-        private void CaptureMethodParameters(object?[] args)
-        {
-            var frame = new System.Diagnostics.StackFrame(3, false);
-            var method = frame.GetMethod();
-            
-            if (method != null)
-            {
-                var parameters = method.GetParameters();
-                
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    if (i < args.Length)
-                    {
-                        _parameters.Add((parameters[i].Name ?? $"param{i}", args[i], "🔸"));
-                    }
-                    else
-                    {
-                        _parameters.Add((parameters[i].Name ?? $"param{i}", GetDefaultValue(parameters[i].ParameterType), "🔸"));
-                    }
-                }
-            }
-        }
 
         private string GetInterfaceName()
         {
@@ -440,22 +425,6 @@ namespace LegacyTestingTools
         }
 
 
-        private object?[] GetMethodArgumentValues(MethodBase method)
-        {
-            // This is also simplified - real implementation would need stack inspection
-            // or other techniques to get actual parameter values
-            var parameters = method.GetParameters();
-            return parameters.Select(p => GetDefaultValue(p.ParameterType)).ToArray();
-        }
-
-        private object? GetDefaultValue(Type type)
-        {
-            if (type.IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-            return null;
-        }
 
         private string FormatValue(object? value)
         {

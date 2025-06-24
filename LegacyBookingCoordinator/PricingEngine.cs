@@ -15,14 +15,13 @@ namespace LegacyBookingCoordinator
         private readonly bool enableDynamicPricing; // Enable/disable dynamic pricing features
         private readonly string currencyCode; // Currency code for this pricing instance
         private readonly decimal historicalData; // Historical pricing data for calculations
-        private readonly DateTime _bookingDate;
-
+        
         /// <summary>
         /// Initialize pricing engine with configuration
         /// NOTE: Constructor parameters must match the database schema exactly
         /// </summary>
         public PricingEngine(decimal taxRate, Dictionary<string, decimal> airlineFees, 
-            bool applyRandomSurcharges, string regionCode, decimal averageFlightCost, DateTime bookingDate)
+            bool applyRandomSurcharges, string regionCode, decimal averageFlightCost)
         {
             // Initialize core pricing parameters
             this.baseMultiplier = taxRate;
@@ -30,7 +29,6 @@ namespace LegacyBookingCoordinator
             this.enableDynamicPricing = applyRandomSurcharges;
             this.currencyCode = regionCode;
             this.historicalData = averageFlightCost;
-            _bookingDate = bookingDate;
         }
 
         /// <summary>
@@ -65,7 +63,7 @@ namespace LegacyBookingCoordinator
         /// </summary>
         public decimal CalculateTimeBasedMarkup(DateTime departureDate)
         {
-            var daysUntilFlight = (departureDate - _bookingDate).TotalDays;
+            var daysUntilFlight = (departureDate - DateTime.Now).TotalDays;
             
             if (daysUntilFlight < 7)
                 return 150.0m; // Last minute surcharge
@@ -107,7 +105,7 @@ namespace LegacyBookingCoordinator
             
             // Apply random promotional discounts to test the market
             // TODO: Replace this with proper discount service integration
-            var random = Create<Random>().Next(0, 5);
+            var random = new Random().Next(0, 5);
             if (random == 1)
             {
                 discountAmount = 25.0m; // Premium discount

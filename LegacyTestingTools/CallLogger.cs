@@ -4,19 +4,169 @@ using System.Text;
 
 namespace LegacyTestingTools
 {
+    public abstract class CallLogFormatter
+    {
+        private readonly Dictionary<string, HashSet<int>> _ignoredArguments = new();
+        private readonly HashSet<string> _ignoredCalls = new();
+        private readonly HashSet<string> _ignoredAllArguments = new();
+        private readonly HashSet<string> _ignoredReturnValues = new();
+        private readonly Dictionary<string, string> _notes = new();
+
+        protected void IgnoreCall(string methodName)
+        {
+            _ignoredCalls.Add(methodName);
+        }
+
+        protected void IgnoreArgument(string methodName, int argumentIndex)
+        {
+            if (!_ignoredArguments.ContainsKey(methodName))
+                _ignoredArguments[methodName] = new HashSet<int>();
+            _ignoredArguments[methodName].Add(argumentIndex);
+        }
+
+        protected void IgnoreAllArguments(string methodName)
+        {
+            _ignoredAllArguments.Add(methodName);
+        }
+
+        protected void IgnoreReturnValue(string methodName)
+        {
+            _ignoredReturnValues.Add(methodName);
+        }
+
+        protected void AddNote(string methodName, string note)
+        {
+            _notes[methodName] = note;
+        }
+
+        internal bool ShouldIgnoreCall(string methodName) => _ignoredCalls.Contains(methodName);
+        internal bool ShouldIgnoreArgument(string methodName, int index) => _ignoredArguments.ContainsKey(methodName) && _ignoredArguments[methodName].Contains(index);
+        internal bool ShouldIgnoreAllArguments(string methodName) => _ignoredAllArguments.Contains(methodName);
+        internal bool ShouldIgnoreReturnValue(string methodName) => _ignoredReturnValues.Contains(methodName);
+        internal string? GetNote(string methodName) => _notes.TryGetValue(methodName, out var note) ? note : null;
+    }
+
+    public class CallLoggerProxy<T> : DispatchProxy where T : class
+    {
+        private T _target = null!;
+        private CallLogger _logger = null!;
+        private string _emoji = "";
+        private CallLogFormatter? _formatter;
+
+        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+        {
+            if (targetMethod == null) return null;
+
+            var methodName = targetMethod.Name;
+            
+            // Check if call should be ignored
+            if (_formatter?.ShouldIgnoreCall(methodName) == true)
+            {
+                return targetMethod.Invoke(_target, args);
+            }
+
+            // Create a new logger instance for this call
+            var sb = new StringBuilder();
+            var callLogger = new CallLogger(sb, _emoji);
+            
+            // Add arguments if not ignored
+            if (args != null && _formatter?.ShouldIgnoreAllArguments(methodName) != true)
+            {
+                var parameters = targetMethod.GetParameters();
+                for (int i = 0; i < args.Length && i < parameters.Length; i++)
+                {
+                    if (_formatter?.ShouldIgnoreArgument(methodName, i) != true)
+                    {
+                        if (parameters[i].IsOut)
+                        {
+                            callLogger.withArgument("out", parameters[i].Name);
+                        }
+                        else if (parameters[i].ParameterType.IsByRef)
+                        {
+                            callLogger.withArgument($"ref {args[i]}", parameters[i].Name);
+                        }
+                        else
+                        {
+                            callLogger.withArgument(args[i], parameters[i].Name);
+                        }
+                    }
+                }
+            }
+
+            // Add custom note if available
+            var note = _formatter?.GetNote(methodName);
+            if (note != null)
+            {
+                callLogger.withNote(note);
+            }
+
+            // Invoke the actual method
+            object? result;
+            try
+            {
+                result = targetMethod.Invoke(_target, args);
+            }
+            catch (Exception ex)
+            {
+                callLogger.withNote($"Exception: {ex.Message}");
+                callLogger.log(methodName);
+                _logger._storybook.Append(sb.ToString());
+                throw;
+            }
+
+            // Log return value if not ignored
+            if (result != null && _formatter?.ShouldIgnoreReturnValue(methodName) != true)
+            {
+                callLogger.withReturn(result);
+            }
+
+            // Log out parameters
+            if (args != null)
+            {
+                var parameters = targetMethod.GetParameters();
+                for (int i = 0; i < args.Length && i < parameters.Length; i++)
+                {
+                    if (parameters[i].IsOut || parameters[i].ParameterType.IsByRef)
+                    {
+                        callLogger.withOut(args[i], parameters[i].Name);
+                    }
+                }
+            }
+
+            callLogger.log(methodName);
+            _logger._storybook.Append(sb.ToString());
+            return result;
+        }
+
+        public static T Create(T target, CallLogger logger, string emoji)
+        {
+            var proxy = Create<T, CallLoggerProxy<T>>() as CallLoggerProxy<T>;
+            proxy!._target = target;
+            proxy._logger = logger;
+            proxy._emoji = emoji;
+            proxy._formatter = target as CallLogFormatter;
+            return (proxy as T)!;
+        }
+    }
+
     public class CallLogger
     {
-        private readonly StringBuilder _storybook;
+        internal readonly StringBuilder _storybook;
         private readonly string _emoji;
         private object? _returnValue;
         private string? _note;
         private readonly List<(string name, object? value, string emoji)> _parameters = new();
         private string? _methodName;
 
-        public CallLogger(StringBuilder storybook, string emoji)
+        public CallLogger(StringBuilder storybook, string emoji = "")
         {
             _storybook = storybook;
             _emoji = emoji;
+        }
+
+        public T Wrap<T>(T target, string emoji = "🔧") where T : class
+        {
+            return CallLoggerProxy<T>.Create(target, this, emoji);
         }
 
         public CallLogger withReturn(object? returnValue, string? description = null)
@@ -96,6 +246,7 @@ namespace LegacyTestingTools
 
         private void LogMethodCall()
         {
+            // Use detailed format for all calls
             _storybook.AppendLine($"{_emoji} {_methodName}:");
             
             foreach (var (name, value, emoji) in _parameters)

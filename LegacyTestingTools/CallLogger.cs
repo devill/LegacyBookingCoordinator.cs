@@ -33,12 +33,12 @@ namespace LegacyTestingTools
             _currentCallLogger.Value?.withNote(note);
         }
         
-        public static void SetConstructorArguments(params string[] argumentNames)
+        public static void SetConstructorArgumentNames(params string[] argumentNames)
         {
             _constructorArgNames.Value = argumentNames;
         }
         
-        internal static string[]? GetConstructorArguments()
+        internal static string[]? GetConstructorArgumentNames()
         {
             return _constructorArgNames.Value;
         }
@@ -129,7 +129,6 @@ namespace LegacyTestingTools
         private T _target = null!;
         private CallLogger _logger = null!;
         private string _emoji = "";
-        private CallLogFormatter? _formatter;
         private string? _interfaceName;
 
         public void ConstructorCalledWith(params object[] args)
@@ -164,7 +163,7 @@ namespace LegacyTestingTools
             // Add individual arguments - use names from context if available
             if (args != null)
             {
-                var constructorArgNames = CallLogFormatterContext.GetConstructorArguments();
+                var constructorArgNames = CallLogFormatterContext.GetConstructorArgumentNames();
                 for (int i = 0; i < args.Length; i++)
                 {
                     var argName = (constructorArgNames != null && i < constructorArgNames.Length) 
@@ -186,13 +185,6 @@ namespace LegacyTestingTools
             if (targetMethod == null) return null;
 
             var methodName = targetMethod.Name;
-            
-            // Check if call should be ignored
-            if (_formatter?.ShouldIgnoreCall(methodName) == true)
-            {
-                return targetMethod.Invoke(_target, args);
-            }
-
 
             // Create a new logger instance for this call
             var sb = new StringBuilder();
@@ -202,13 +194,39 @@ namespace LegacyTestingTools
             CallLogFormatterContext.SetCurrentLogger(callLogger);
             CallLogFormatterContext.SetCurrentMethodName(methodName);
             
+            // Invoke the actual method first to let it set context
+            object? result;
+            try
+            {
+                result = targetMethod.Invoke(_target, args);
+            }
+            catch (Exception ex)
+            {
+                callLogger.withNote($"Exception: {ex.Message}");
+                callLogger.log(methodName);
+                _logger._storybook.Append(sb.ToString());
+                
+                // Clear current logger context even on exception
+                CallLogFormatterContext.ClearCurrentLogger();
+                
+                throw;
+            }
+            
+            // Check if the call should be ignored (after method execution)
+            if (callLogger._ignoredCalls.Contains(methodName))
+            {
+                CallLogFormatterContext.ClearCurrentLogger();
+                return result;
+            }
+            
             // Add arguments if not ignored
-            if (args != null && _formatter?.ShouldIgnoreAllArguments(methodName) != true)
+            if (args != null && !callLogger._ignoredAllArguments.Contains(methodName))
             {
                 var parameters = targetMethod.GetParameters();
                 for (int i = 0; i < args.Length && i < parameters.Length; i++)
                 {
-                    if (_formatter?.ShouldIgnoreArgument(methodName, i) != true)
+                    if (!callLogger._ignoredArguments.ContainsKey(methodName) || 
+                        !callLogger._ignoredArguments[methodName].Contains(i))
                     {
                         if (parameters[i].IsOut)
                         {
@@ -226,33 +244,8 @@ namespace LegacyTestingTools
                 }
             }
 
-            // Add custom note if available
-            var note = _formatter?.GetNote(methodName);
-            if (note != null)
-            {
-                callLogger.withNote(note);
-            }
-
-            // Invoke the actual method
-            object? result;
-            try
-            {
-                result = targetMethod.Invoke(_target, args);
-            }
-            catch (Exception ex)
-            {
-                callLogger.withNote($"Exception: {ex.Message}");
-                callLogger.log(methodName);
-                _logger._storybook.Append(sb.ToString());
-                
-                // Clear current logger context even on exception
-                CallLogFormatterContext.ClearCurrentLogger();
-                
-                throw;
-            }
-
             // Log return value if not ignored
-            if (result != null && _formatter?.ShouldIgnoreReturnValue(methodName) != true)
+            if (result != null && !callLogger._ignoredReturnValues.Contains(methodName))
             {
                 callLogger.withReturn(result);
             }
@@ -285,7 +278,6 @@ namespace LegacyTestingTools
             proxy!._target = target;
             proxy._logger = logger;
             proxy._emoji = emoji;
-            proxy._formatter = target as CallLogFormatter;
             return (proxy as T)!;
         }
     }

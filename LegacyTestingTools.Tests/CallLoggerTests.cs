@@ -72,25 +72,24 @@ namespace LegacyTestingTools.Tests
         }
     }
     
-    public class FormattedTestService : CallLogFormatter, ITestService
+    public class FormattedTestService : ITestService
     {
         public int Calculate(int a, int b)
         {
+            LegacyTestingTools.CallLogFormatterContext.IgnoreAllArguments();
+            LegacyTestingTools.CallLogFormatterContext.AddNote("This calculation ignores all arguments in logs");
             return a + b;
         }
         
-        public void ProcessData(string input) { }
+        public void ProcessData(string input) 
+        { 
+            LegacyTestingTools.CallLogFormatterContext.IgnoreCall();
+        }
         
         public bool TryProcess(string input, out string output)
         {
             output = $"processed_{input}";
             return true;
-        }
-
-        public FormattedTestService()
-        {
-            IgnoreAllArguments(nameof(Calculate));
-            IgnoreCall(nameof(ProcessData));
         }
     }
 }

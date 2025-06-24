@@ -63,9 +63,12 @@ var logger = factory.Create<IAuditLogger, AuditLogger>(logDirectory, verboseMode
 
 In tests, you can override what gets created:
 ```csharp
-factory.SetAlways<AuditLogger>(new FakeAuditLogger());     // For concrete types
-factory.SetAlways<IAuditLogger>(new FakeAuditLogger());    // For interface types  
-factory.SetOne<PricingEngine>(new FakePricingEngine());    // Return this fake once, then normal creation
+// For concrete types
+factory.SetAlways<AuditLogger>(new FakeAuditLogger());     
+// For interface types
+factory.SetAlways<IAuditLogger>(new FakeAuditLogger());
+// Return this fake once, then normal creation
+factory.SetOne<PricingEngine>(new FakePricingEngine());    
 ```
 
 #### Constructor arguments

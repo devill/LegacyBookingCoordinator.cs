@@ -1,1 +1,1 @@
-global using static LegacyBookingCoordinator.ObjectCreation;
+global using static LegacyTestingTools.ObjectCreation;

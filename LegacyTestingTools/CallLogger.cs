@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace LegacyBookingCoordinator.Tests
+namespace LegacyTestingTools
 {
     public class CallLogger
     {

@@ -1,14 +1,14 @@
-namespace LegacyBookingCoordinator
+namespace LegacyTestingTools
 {
     /// <summary>
     /// Interface for test doubles that need to log constructor arguments to the storybook.
-    /// When a fake implements this interface, GlobalObjectDispatcher will call 
+    /// When a fake implements this interface, ObjectFactory will call 
     /// ConstructorCalledWith with the exact arguments passed to Create.
     /// </summary>
     public interface IConstructorCalledWith
     {
         /// <summary>
-        /// Called by GlobalObjectDispatcher with the constructor arguments before object creation.
+        /// Called by ObjectFactory with the constructor arguments before object creation.
         /// Implement this method to log constructor arguments to your storybook for test verification.
         /// </summary>
         /// <param name="args">The constructor arguments that will be passed to the real implementation</param>

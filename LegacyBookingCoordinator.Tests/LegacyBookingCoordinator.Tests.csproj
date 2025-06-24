@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LegacyBookingCoordinator\LegacyBookingCoordinator.csproj" />
+    <ProjectReference Include="..\LegacyTestingTools\LegacyTestingTools.csproj" />
   </ItemGroup>
 
 </Project>

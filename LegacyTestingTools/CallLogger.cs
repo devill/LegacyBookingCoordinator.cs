@@ -5,6 +5,26 @@ using System.Text;
 
 namespace LegacyTestingTools
 {
+    public static class CallLogFormatterContext
+    {
+        private static readonly ThreadLocal<CallLogger?> _currentCallLogger = new(() => null);
+        
+        public static void SetCurrentLogger(CallLogger logger)
+        {
+            _currentCallLogger.Value = logger;
+        }
+        
+        public static void ClearCurrentLogger()
+        {
+            _currentCallLogger.Value = null;
+        }
+        
+        public static void AddNote(string note)
+        {
+            _currentCallLogger.Value?.withNote(note);
+        }
+    }
+
     public abstract class CallLogFormatter
     {
         private readonly Dictionary<string, HashSet<int>> _ignoredArguments = new();
@@ -116,6 +136,9 @@ namespace LegacyTestingTools
             var sb = new StringBuilder();
             var callLogger = new CallLogger(sb, _emoji);
             
+            // Set current logger context for stubs to access
+            CallLogFormatterContext.SetCurrentLogger(callLogger);
+            
             // Add arguments if not ignored
             if (args != null && _formatter?.ShouldIgnoreAllArguments(methodName) != true)
             {
@@ -158,6 +181,10 @@ namespace LegacyTestingTools
                 callLogger.withNote($"Exception: {ex.Message}");
                 callLogger.log(methodName);
                 _logger._storybook.Append(sb.ToString());
+                
+                // Clear current logger context even on exception
+                CallLogFormatterContext.ClearCurrentLogger();
+                
                 throw;
             }
 
@@ -182,6 +209,10 @@ namespace LegacyTestingTools
 
             callLogger.log(methodName);
             _logger._storybook.Append(sb.ToString());
+            
+            // Clear current logger context
+            CallLogFormatterContext.ClearCurrentLogger();
+            
             return result;
         }
 

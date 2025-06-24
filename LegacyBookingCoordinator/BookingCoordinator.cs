@@ -176,7 +176,7 @@ namespace LegacyBookingCoordinator
                 return "INTL";
         }
         
-        private decimal GetHistoricalAverageFromRepository(BookingRepository repository, string flightNumber)
+        private decimal GetHistoricalAverageFromRepository(IBookingRepository repository, string flightNumber)
         {
             temporaryData["historicalLookupCount"] = 
                 (int)(temporaryData.ContainsKey("historicalLookupCount") ? temporaryData["historicalLookupCount"] : 0) + 1;

@@ -11,7 +11,7 @@ namespace LegacyTestingTools
         private readonly Dictionary<Type, Queue<object>> _queuedObjects = new Dictionary<Type, Queue<object>>();
         private readonly Dictionary<Type, object> _alwaysObjects = new Dictionary<Type, object>();
 
-        private ObjectFactory() { }
+        public ObjectFactory() { }
 
         public static ObjectFactory Instance()
         {

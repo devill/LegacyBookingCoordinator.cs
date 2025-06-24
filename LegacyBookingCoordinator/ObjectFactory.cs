@@ -110,5 +110,19 @@ namespace LegacyBookingCoordinator
             _queuedObjects.Clear();
         }
     }
+
+    // Global convenience functions
+    public static class ObjectCreation
+    {
+        public static T Create<T>(params object[] args)
+        {
+            return ObjectFactory.Instance().Create<T>(args);
+        }
+
+        public static I Create<I, T>(params object[] args) where T : class, I
+        {
+            return ObjectFactory.Instance().Create<I, T>(args);
+        }
+    }
 }
 

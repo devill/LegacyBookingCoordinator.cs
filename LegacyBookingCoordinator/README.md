@@ -27,9 +27,9 @@ The booking system coordinates:
 5. **BookingRepository**: Saves booking data to a proprietary database (only available in production).
 6. **BookingCoordinator**: The main orchestrator that coordinates all the services.
 
-# 🏆Chalenges
+# 🏆 Challenges
 
-## 🥉Inject dependencies 
+## 🥉 Inject dependencies 
 
 ### 🔧 Task
 
@@ -38,7 +38,7 @@ Use the `ObjectFactory` to write a test for `BookingCoordinator.BookFlight()` th
 * Checks that it returns the booking reference produced by the `BookingRepository`
 * All *without extensive changes to the production code*.
 
-Obviously is **impossible** without changing the code. But with `ObjectFactory`, you can refactor the `new` calls to use `factory.Create<T>()`, and inject test doubles that record behavior.
+This is **impossible** without changing the code. With `ObjectFactory`, you can refactor the `new` calls to use `factory.Create<T>()` and inject test doubles that record behavior.
 
 ### 🏭 Concept: ObjectFactory
 
@@ -76,26 +76,26 @@ If you want to test constructor arguments make sure your test double implements 
 
 You can either inject an instance of the factory (harder, but better long term) or use the Singleton instance:
 ```
-ObjectFactory.Instance().Create<YourClass>(constuctor, arguments);
+ObjectFactory.Instance().Create<YourClass>(constructor, arguments);
 ```
 
 Or use the shorthand:
 ```
-Create<YourClass>(constuctor, arguments);
+Create<YourClass>(constructor, arguments);
 ```
 
 ⚠️ **Important**: All tests that rely on the singleton instance of `ObjectFactory` should call `ObjectFactory.Instance().ClearAll()` to make sure tests remain independent.
 
-⚠️ **Word of caucion**: While the singleton instance can be convenient, it can also cause trouble when overused. Only use it temporarily when the alternative is passing in the factory through several layers of indirection. 
+⚠️ **Word of caution**: While the singleton instance can be convenient, it can also cause trouble when overused. Only use it temporarily when the alternative is passing in the factory through several layers of indirection. 
 
-## 🥈Test the interractions
+## 🥈 Test the interactions
 
 ### 🛠️ Task
 
 Improve the test for `BookingCoordinator.BookFlight()` so that:
 * It checks the booking was saved as expected.
 * It checks a notification was sent to the correct place.
-* It checks price calculation is correct
+* It checks price calculation is correct.
 * Verifies logging occurred.
 
 Writing a test like that with conventional methods is tedious. Use the `CallLogger` to create a storybook of calls.
@@ -138,12 +138,12 @@ class TestDoubleFake : ISomeService, IConstructorCalledWith
 }
 ```
 
-## 🥇Cover all paths
+## 🥇 Cover all paths
 
-### 🚜Task
+### 🚜 Task
 
-Now that you have one test, you are on your way. However, writing a large number of similar tests can become tedious. Use a data provider and default values to build a comprehensive test suite for `BookingCoordinator`
+Now that you have one test, you are on your way. However, writing a large number of similar tests can become tedious. Use a data provider and default values to build a comprehensive test suite for `BookingCoordinator`.
 
-### 📀Data Provider
+### 📀 Data Provider
 
 **TODO**

@@ -10,6 +10,7 @@ namespace LegacyTestingTools
     {
         private static readonly ThreadLocal<CallLogger?> _currentCallLogger = new(() => null);
         private static readonly ThreadLocal<string?> _currentMethodName = new(() => null);
+        private static readonly ThreadLocal<string[]?> _constructorArgNames = new(() => null);
         
         public static void SetCurrentLogger(CallLogger logger)
         {
@@ -25,11 +26,22 @@ namespace LegacyTestingTools
         {
             _currentCallLogger.Value = null;
             _currentMethodName.Value = null;
+            _constructorArgNames.Value = null;
         }
         
         public static void AddNote(string note)
         {
             _currentCallLogger.Value?.withNote(note);
+        }
+        
+        public static void SetConstructorArguments(params string[] argumentNames)
+        {
+            _constructorArgNames.Value = argumentNames;
+        }
+        
+        internal static string[]? GetConstructorArguments()
+        {
+            return _constructorArgNames.Value;
         }
         
         public static void IgnoreCall()
@@ -140,30 +152,22 @@ namespace LegacyTestingTools
             var callLogger = new CallLogger(_logger._storybook, _emoji);
             callLogger.forInterface(interfaceName);
             
-            // Add individual arguments instead of the wrapped array
+            // Add individual arguments - use names from context if available
             if (args != null)
             {
-                var constructorArgs = GetExpectedConstructorArgs(interfaceName);
-                for (int i = 0; i < args.Length && i < constructorArgs.Length; i++)
+                var constructorArgNames = CallLogFormatterContext.GetConstructorArguments();
+                for (int i = 0; i < args.Length; i++)
                 {
-                    callLogger.withArgument(args[i], constructorArgs[i]);
+                    var argName = (constructorArgNames != null && i < constructorArgNames.Length) 
+                        ? constructorArgNames[i] 
+                        : $"Arg{i}";
+                    callLogger.withArgument(args[i], argName);
                 }
             }
             
             callLogger.log("ConstructorCalledWith");
         }
 
-        private string[] GetExpectedConstructorArgs(string interfaceName)
-        {
-            return interfaceName switch
-            {
-                "IBookingRepository" => new[] { "dbConnectionString", "maxRetries" },
-                "IFlightAvailabilityService" => new[] { "connectionString" },
-                "IPartnerNotifier" => new[] { "smtpServer", "useEncryption" },
-                "IAuditLogger" => new[] { "logDirectory", "verboseMode" },
-                _ => new string[0]
-            };
-        }
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
@@ -363,26 +367,9 @@ namespace LegacyTestingTools
             var interfaceName = _forcedInterfaceName ?? GetInterfaceName();
             _storybook.AppendLine($"{_emoji} {interfaceName} constructor called with:");
             
-            // Use fluent API parameters if available, otherwise use hardcoded values
-            if (_parameters.Count > 0)
+            foreach (var (name, value, emoji) in _parameters)
             {
-                foreach (var (name, value, emoji) in _parameters)
-                {
-                    _storybook.AppendLine($"  {emoji} {name}: {value}");
-                }
-            }
-            else
-            {
-                var frame = new System.Diagnostics.StackFrame(3, false);
-                var method = frame.GetMethod();
-                if (method?.GetParameters() != null)
-                {
-                    var constructorArgs = GetConstructorArguments(method);
-                    for (int i = 0; i < constructorArgs.Length; i++)
-                    {
-                        _storybook.AppendLine($"  🔸 Arg{i}: {constructorArgs[i]}");
-                    }
-                }
+                _storybook.AppendLine($"  {emoji} {name}: {value}");
             }
             
             _storybook.AppendLine();
@@ -452,20 +439,6 @@ namespace LegacyTestingTools
             return "Unknown";
         }
 
-        private object?[] GetConstructorArguments(MethodBase method)
-        {
-            var interfaceName = GetInterfaceName();
-            
-            // Return hardcoded values that match expected test output
-            return interfaceName switch
-            {
-                "IBookingRepository" => new object[] { "Server=production-db;Database=FlightBookings;Trusted_Connection=true;", "1" },
-                "IFlightAvailabilityService" => new object[] { "Server=production-db;Database=FlightAvailability_AA;Trusted_Connection=true;" },
-                "IPartnerNotifier" => new object[] { "smtp.american.com", "True" },
-                "IAuditLogger" => new object[] { @"C:\Logs\BookingLogs\LowVolume", "False" },
-                _ => new object[] { "Unknown" }
-            };
-        }
 
         private object?[] GetMethodArgumentValues(MethodBase method)
         {

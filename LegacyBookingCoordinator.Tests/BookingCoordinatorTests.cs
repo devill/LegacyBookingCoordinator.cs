@@ -73,7 +73,7 @@ namespace LegacyBookingCoordinator.Tests
 
         public void ConstructorCalledWith(params object[] args)
         {
-            
+            SetConstructorArguments("connectionString");
         }
     }
 
@@ -97,7 +97,7 @@ namespace LegacyBookingCoordinator.Tests
 
         public void ConstructorCalledWith(params object[] args)
         {
-         
+            SetConstructorArguments("smtpServer", "useEncryption");
         }
     }
 
@@ -125,7 +125,7 @@ namespace LegacyBookingCoordinator.Tests
 
         public void ConstructorCalledWith(params object[] args)
         {
-            
+            SetConstructorArguments("logDirectory", "verboseMode");
         }
     }
 
@@ -154,7 +154,7 @@ namespace LegacyBookingCoordinator.Tests
 
         public void ConstructorCalledWith(params object[] args)
         {
-            
+            SetConstructorArguments("dbConnectionString", "maxRetries");
         }
     }
 }

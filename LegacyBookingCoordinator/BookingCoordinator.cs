@@ -11,11 +11,22 @@ namespace LegacyBookingCoordinator
     /// </summary>
     public class BookingCoordinator
     {
+        private readonly DateTime _bookingDate;
         private string lastBookingRef; // Stores reference for debugging purposes
         private int bookingCounter = 1; // Global counter for booking sequence
         private bool isProcessingBooking = false; // Thread safety flag (NOTE: not actually thread-safe)
         private Dictionary<string, object> temporaryData = new Dictionary<string, object>(); // Temporary storage for calculation intermediates
-        
+
+        public BookingCoordinator(DateTime bookingDate)
+        {
+            _bookingDate = bookingDate;
+        }
+
+        public BookingCoordinator()
+        {
+            _bookingDate = DateTime.Now;
+        }
+
         /// <summary>
         /// Main entry point for flight booking process
         /// Coordinates all services and returns booking reference number
@@ -33,7 +44,7 @@ namespace LegacyBookingCoordinator
             var maxRetries = CalculateRetriesBasedOnBookingCount(); // Dynamic retry calculation
             
             // Create repository with calculated parameters
-            var repository = new BookingRepository(connectionString, maxRetries);
+            var repository = Create<IBookingRepository, BookingRepository>(connectionString, maxRetries);
             
             // Calculate pricing engine parameters based on current state
             var taxRate = CalculateTaxRateBasedOnGlobalState(airlineCode);
@@ -42,10 +53,10 @@ namespace LegacyBookingCoordinator
             var regionCode = DetermineRegionFromFlightNumber(flightNumber);
             var historicalAverage = GetHistoricalAverageFromRepository(repository, flightNumber);
             
-            var pricingEngine = new PricingEngine(taxRate, airlineFees, enableRandomSurcharges, regionCode, historicalAverage);
+            var pricingEngine = new PricingEngine(taxRate, airlineFees, enableRandomSurcharges, regionCode, historicalAverage, _bookingDate);
             
             var availabilityConnectionString = ModifyConnectionStringForAvailability(connectionString, flightNumber);
-            var availabilityService = new FlightAvailabilityService(availabilityConnectionString);
+            var availabilityService = Create<IFlightAvailabilityService,FlightAvailabilityService>(availabilityConnectionString);
             
             var availableSeats = availabilityService.CheckAndGetAvailableSeatsForBooking(flightNumber, departureDate, passengerCount);
             if (availableSeats.Count < passengerCount)
@@ -75,12 +86,12 @@ namespace LegacyBookingCoordinator
             // Configure partner notification settings
             var smtpServer = DetermineSmtpServerFromAirlineCode(airlineCode);
             var useEncryption = bookingCounter % 2 == 0; // Alternate encryption for load balancing
-            var partnerNotifier = new PartnerNotifier(smtpServer, useEncryption);
+            var partnerNotifier = Create<IPartnerNotifier,PartnerNotifier>(smtpServer, useEncryption);
             
             // Setup audit logging with dynamic configuration
             var logDirectory = CalculateLogDirectoryFromBookingCount();
             var verboseMode = temporaryData.ContainsKey("debugMode"); // Enable verbose mode if debug flag set
-            var auditLogger = new AuditLogger(logDirectory, verboseMode);
+            var auditLogger = Create<IAuditLogger,AuditLogger>(logDirectory, verboseMode);
             
             // Generate unique booking reference
             var bookingReference = GenerateBookingReferenceAndUpdateCounters(passengerName, flightNumber);
@@ -89,14 +100,14 @@ namespace LegacyBookingCoordinator
             // Save booking details
             var actualBookingRef = repository.SaveBookingDetails(passengerName, 
                 $"{flightNumber} on {departureDate:yyyy-MM-dd} for {passengerCount} passengers", 
-                finalPrice, DateTime.Now);
+                finalPrice, _bookingDate);
             
             // Log the booking activity
             auditLogger.LogBookingActivity("Flight Booked", actualBookingRef, 
                 $"Passenger: {passengerName}, Flight: {flightNumber}");
             
             auditLogger.RecordPricingCalculation(
-                $"Base: {basePrice}, Weekday: {weekdayMultiplier}, Seasonal: {seasonalBonus}, Special: {specialRequestSurcharge}, Discount: {discountAmount}",
+                $"Base: {basePrice.ToString(System.Globalization.CultureInfo.InvariantCulture)}, Weekday: {weekdayMultiplier.ToString(System.Globalization.CultureInfo.InvariantCulture)}, Seasonal: {seasonalBonus.ToString(System.Globalization.CultureInfo.InvariantCulture)}, Special: {specialRequestSurcharge.ToString(System.Globalization.CultureInfo.InvariantCulture)}, Discount: {discountAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
                 finalPrice, $"{flightNumber} on {departureDate:yyyy-MM-dd}");
             
             // Partner notification 
@@ -116,7 +127,7 @@ namespace LegacyBookingCoordinator
             partnerNotifier.UpdatePartnerBookingStatus(airlineCode, actualBookingRef, bookingStatus);
             
             temporaryData["lastBookingPrice"] = finalPrice;
-            temporaryData["lastBookingDate"] = DateTime.Now;
+            temporaryData["lastBookingDate"] = _bookingDate;
             isProcessingBooking = false;
             
             return actualBookingRef;
@@ -274,7 +285,7 @@ namespace LegacyBookingCoordinator
         
         private string DetermineSmtpServerFromAirlineCode(string airlineCode)
         {
-            temporaryData["lastSmtpLookup"] = DateTime.Now;
+            temporaryData["lastSmtpLookup"] = _bookingDate;
             
             switch (airlineCode)
             {

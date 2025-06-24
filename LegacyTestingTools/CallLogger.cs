@@ -9,20 +9,65 @@ namespace LegacyTestingTools
     public static class CallLogFormatterContext
     {
         private static readonly ThreadLocal<CallLogger?> _currentCallLogger = new(() => null);
+        private static readonly ThreadLocal<string?> _currentMethodName = new(() => null);
         
         public static void SetCurrentLogger(CallLogger logger)
         {
             _currentCallLogger.Value = logger;
         }
         
+        public static void SetCurrentMethodName(string methodName)
+        {
+            _currentMethodName.Value = methodName;
+        }
+        
         public static void ClearCurrentLogger()
         {
             _currentCallLogger.Value = null;
+            _currentMethodName.Value = null;
         }
         
         public static void AddNote(string note)
         {
             _currentCallLogger.Value?.withNote(note);
+        }
+        
+        public static void IgnoreCall()
+        {
+            var methodName = _currentMethodName.Value;
+            if (methodName != null && _currentCallLogger.Value != null)
+            {
+                _currentCallLogger.Value._ignoredCalls.Add(methodName);
+            }
+        }
+        
+        public static void IgnoreArgument(int argumentIndex)
+        {
+            var methodName = _currentMethodName.Value;
+            if (methodName != null && _currentCallLogger.Value != null)
+            {
+                if (!_currentCallLogger.Value._ignoredArguments.ContainsKey(methodName))
+                    _currentCallLogger.Value._ignoredArguments[methodName] = new HashSet<int>();
+                _currentCallLogger.Value._ignoredArguments[methodName].Add(argumentIndex);
+            }
+        }
+        
+        public static void IgnoreAllArguments()
+        {
+            var methodName = _currentMethodName.Value;
+            if (methodName != null && _currentCallLogger.Value != null)
+            {
+                _currentCallLogger.Value._ignoredAllArguments.Add(methodName);
+            }
+        }
+        
+        public static void IgnoreReturnValue()
+        {
+            var methodName = _currentMethodName.Value;
+            if (methodName != null && _currentCallLogger.Value != null)
+            {
+                _currentCallLogger.Value._ignoredReturnValues.Add(methodName);
+            }
         }
     }
 
@@ -139,6 +184,7 @@ namespace LegacyTestingTools
             
             // Set current logger context for stubs to access
             CallLogFormatterContext.SetCurrentLogger(callLogger);
+            CallLogFormatterContext.SetCurrentMethodName(methodName);
             
             // Add arguments if not ignored
             if (args != null && _formatter?.ShouldIgnoreAllArguments(methodName) != true)
@@ -237,6 +283,12 @@ namespace LegacyTestingTools
         private readonly List<(string name, object? value, string emoji)> _parameters = new();
         private string? _methodName;
         private string? _forcedInterfaceName;
+        
+        // Internal fields for ignored calls/arguments/returns (used by CallLogFormatterContext)
+        internal readonly Dictionary<string, HashSet<int>> _ignoredArguments = new();
+        internal readonly HashSet<string> _ignoredCalls = new();
+        internal readonly HashSet<string> _ignoredAllArguments = new();
+        internal readonly HashSet<string> _ignoredReturnValues = new();
 
         public CallLogger(StringBuilder storybook, string emoji = "")
         {

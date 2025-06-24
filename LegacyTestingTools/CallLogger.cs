@@ -82,47 +82,6 @@ namespace LegacyTestingTools
         }
     }
 
-    public abstract class CallLogFormatter
-    {
-        private readonly Dictionary<string, HashSet<int>> _ignoredArguments = new();
-        private readonly HashSet<string> _ignoredCalls = new();
-        private readonly HashSet<string> _ignoredAllArguments = new();
-        private readonly HashSet<string> _ignoredReturnValues = new();
-        private readonly Dictionary<string, string> _notes = new();
-
-        protected void IgnoreCall(string methodName)
-        {
-            _ignoredCalls.Add(methodName);
-        }
-
-        protected void IgnoreArgument(string methodName, int argumentIndex)
-        {
-            if (!_ignoredArguments.ContainsKey(methodName))
-                _ignoredArguments[methodName] = new HashSet<int>();
-            _ignoredArguments[methodName].Add(argumentIndex);
-        }
-
-        protected void IgnoreAllArguments(string methodName)
-        {
-            _ignoredAllArguments.Add(methodName);
-        }
-
-        protected void IgnoreReturnValue(string methodName)
-        {
-            _ignoredReturnValues.Add(methodName);
-        }
-
-        protected void AddNote(string methodName, string note)
-        {
-            _notes[methodName] = note;
-        }
-
-        internal bool ShouldIgnoreCall(string methodName) => _ignoredCalls.Contains(methodName);
-        internal bool ShouldIgnoreArgument(string methodName, int index) => _ignoredArguments.ContainsKey(methodName) && _ignoredArguments[methodName].Contains(index);
-        internal bool ShouldIgnoreAllArguments(string methodName) => _ignoredAllArguments.Contains(methodName);
-        internal bool ShouldIgnoreReturnValue(string methodName) => _ignoredReturnValues.Contains(methodName);
-        internal string? GetNote(string methodName) => _notes.TryGetValue(methodName, out var note) ? note : null;
-    }
 
     public class CallLoggerProxy<T> : DispatchProxy, IConstructorCalledWith where T : class
     {

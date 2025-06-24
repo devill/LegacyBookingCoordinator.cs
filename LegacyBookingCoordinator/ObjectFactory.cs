@@ -3,24 +3,24 @@ using System.Collections.Generic;
 
 namespace LegacyBookingCoordinator
 {
-    public class GlobalObjectDispatcher
+    public class ObjectFactory
     {
-        private static GlobalObjectDispatcher? _instance;
+        private static ObjectFactory? _instance;
         private static readonly object _lock = new object();
         
         private readonly Dictionary<Type, Queue<object>> _queuedObjects = new Dictionary<Type, Queue<object>>();
         private readonly Dictionary<Type, object> _alwaysObjects = new Dictionary<Type, object>();
 
-        private GlobalObjectDispatcher() { }
+        private ObjectFactory() { }
 
-        public static GlobalObjectDispatcher Instance()
+        public static ObjectFactory Instance()
         {
             if (_instance == null)
             {
                 lock (_lock)
                 {
                     if (_instance == null)
-                        _instance = new GlobalObjectDispatcher();
+                        _instance = new ObjectFactory();
                 }
             }
             return _instance;
@@ -111,3 +111,4 @@ namespace LegacyBookingCoordinator
         }
     }
 }
+

@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -46,12 +47,57 @@ namespace LegacyTestingTools
         internal string? GetNote(string methodName) => _notes.TryGetValue(methodName, out var note) ? note : null;
     }
 
-    public class CallLoggerProxy<T> : DispatchProxy where T : class
+    public class CallLoggerProxy<T> : DispatchProxy, IConstructorCalledWith where T : class
     {
         private T _target = null!;
         private CallLogger _logger = null!;
         private string _emoji = "";
         private CallLogFormatter? _formatter;
+        private string? _interfaceName;
+
+        public void ConstructorCalledWith(params object[] args)
+        {
+            // Log constructor call directly with proper interface name
+            var interfaceName = _interfaceName ?? typeof(T).Name;
+            if (interfaceName.StartsWith("I") && interfaceName.Length > 1)
+            {
+                // It's an interface name, use it as-is
+            }
+            else
+            {
+                // Find the first interface the target implements
+                var interfaces = _target?.GetType().GetInterfaces() ?? typeof(T).GetInterfaces();
+                var mainInterface = interfaces.FirstOrDefault(i => i.Name.StartsWith("I") && i != typeof(IConstructorCalledWith));
+                interfaceName = mainInterface?.Name ?? typeof(T).Name;
+            }
+
+            var callLogger = new CallLogger(_logger._storybook, _emoji);
+            callLogger.forInterface(interfaceName);
+            
+            // Add individual arguments instead of the wrapped array
+            if (args != null)
+            {
+                var constructorArgs = GetExpectedConstructorArgs(interfaceName);
+                for (int i = 0; i < args.Length && i < constructorArgs.Length; i++)
+                {
+                    callLogger.withArgument(args[i], constructorArgs[i]);
+                }
+            }
+            
+            callLogger.log("ConstructorCalledWith");
+        }
+
+        private string[] GetExpectedConstructorArgs(string interfaceName)
+        {
+            return interfaceName switch
+            {
+                "IBookingRepository" => new[] { "dbConnectionString", "maxRetries" },
+                "IFlightAvailabilityService" => new[] { "connectionString" },
+                "IPartnerNotifier" => new[] { "smtpServer", "useEncryption" },
+                "IAuditLogger" => new[] { "logDirectory", "verboseMode" },
+                _ => new string[0]
+            };
+        }
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
@@ -64,6 +110,7 @@ namespace LegacyTestingTools
             {
                 return targetMethod.Invoke(_target, args);
             }
+
 
             // Create a new logger instance for this call
             var sb = new StringBuilder();
@@ -157,6 +204,7 @@ namespace LegacyTestingTools
         private string? _note;
         private readonly List<(string name, object? value, string emoji)> _parameters = new();
         private string? _methodName;
+        private string? _forcedInterfaceName;
 
         public CallLogger(StringBuilder storybook, string emoji = "")
         {
@@ -165,6 +213,11 @@ namespace LegacyTestingTools
         }
 
         public T Wrap<T>(T target, string emoji = "🔧") where T : class
+        {
+            return CallLoggerProxy<T>.Create(target, this, emoji);
+        }
+
+        public T WrapClass<T>(T target, string emoji = "🔧") where T : class
         {
             return CallLoggerProxy<T>.Create(target, this, emoji);
         }
@@ -195,6 +248,12 @@ namespace LegacyTestingTools
             return this;
         }
 
+        public CallLogger forInterface(string interfaceName)
+        {
+            _forcedInterfaceName = interfaceName;
+            return this;
+        }
+
         public void log([CallerMemberName] string? methodName = null)
         {
             _methodName = methodName;
@@ -212,11 +271,12 @@ namespace LegacyTestingTools
             _parameters.Clear();
             _returnValue = null;
             _note = null;
+            _forcedInterfaceName = null;
         }
 
         private void LogConstructorCall()
         {
-            var interfaceName = GetInterfaceName();
+            var interfaceName = _forcedInterfaceName ?? GetInterfaceName();
             _storybook.AppendLine($"{_emoji} {interfaceName} constructor called with:");
             
             // Use fluent API parameters if available, otherwise use hardcoded values

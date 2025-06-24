@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -342,7 +343,8 @@ namespace LegacyTestingTools
             
             foreach (var (name, value, emoji) in _parameters)
             {
-                _storybook.AppendLine($"  {emoji} {name}: {value}");
+                var formattedValue = FormatValue(value);
+                _storybook.AppendLine($"  {emoji} {name}: {formattedValue}");
             }
 
             if (!string.IsNullOrEmpty(_note))
@@ -352,7 +354,8 @@ namespace LegacyTestingTools
 
             if (_returnValue != null)
             {
-                _storybook.AppendLine($"  🔹 Returns: {_returnValue}");
+                var formattedReturn = FormatValue(_returnValue);
+                _storybook.AppendLine($"  🔹 Returns: {formattedReturn}");
             }
 
             _storybook.AppendLine();
@@ -427,6 +430,47 @@ namespace LegacyTestingTools
                 return Activator.CreateInstance(type);
             }
             return null;
+        }
+
+        private string FormatValue(object? value)
+        {
+            if (value == null) return "null";
+            
+            // Handle collections (Lists, Arrays, etc.)
+            if (value is System.Collections.IEnumerable enumerable && !(value is string))
+            {
+                var items = new List<string>();
+                foreach (var item in enumerable)
+                {
+                    items.Add(FormatValue(item));
+                }
+                return string.Join(",", items);
+            }
+            
+            // Handle decimals with invariant culture
+            if (value is decimal dec)
+            {
+                return dec.ToString(CultureInfo.InvariantCulture);
+            }
+            
+            // Handle dates with format matching verified.txt
+            if (value is DateTime dt)
+            {
+                return dt.ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            }
+            
+            // Handle other numeric types with invariant culture
+            if (value is double d)
+            {
+                return d.ToString(CultureInfo.InvariantCulture);
+            }
+            
+            if (value is float f)
+            {
+                return f.ToString(CultureInfo.InvariantCulture);
+            }
+            
+            return value.ToString() ?? "null";
         }
     }
 }

@@ -6,7 +6,7 @@ namespace LegacyBookingCoordinator
     {
         private readonly string filePath;
         private readonly bool enableConsoleOutput;
-        
+
         public AuditLogger(string logDirectory, bool verboseMode)
         {
             throw new CanNotUseInTestsException(nameof(AuditLogger));

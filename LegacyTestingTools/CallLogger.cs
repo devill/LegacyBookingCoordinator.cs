@@ -10,39 +10,39 @@ namespace LegacyTestingTools
         private static readonly ThreadLocal<CallLogger?> _currentCallLogger = new(() => null);
         private static readonly ThreadLocal<string?> _currentMethodName = new(() => null);
         private static readonly ThreadLocal<string[]?> _constructorArgNames = new(() => null);
-        
+
         public static void SetCurrentLogger(CallLogger logger)
         {
             _currentCallLogger.Value = logger;
         }
-        
+
         public static void SetCurrentMethodName(string methodName)
         {
             _currentMethodName.Value = methodName;
         }
-        
+
         public static void ClearCurrentLogger()
         {
             _currentCallLogger.Value = null;
             _currentMethodName.Value = null;
             _constructorArgNames.Value = null;
         }
-        
+
         public static void AddNote(string note)
         {
             _currentCallLogger.Value?.withNote(note);
         }
-        
+
         public static void SetConstructorArgumentNames(params string[] argumentNames)
         {
             _constructorArgNames.Value = argumentNames;
         }
-        
+
         internal static string[]? GetConstructorArgumentNames()
         {
             return _constructorArgNames.Value;
         }
-        
+
         public static void IgnoreCall()
         {
             var methodName = _currentMethodName.Value;
@@ -51,7 +51,7 @@ namespace LegacyTestingTools
                 _currentCallLogger.Value._ignoredCalls.Add(methodName);
             }
         }
-        
+
         public static void IgnoreArgument(int argumentIndex)
         {
             var methodName = _currentMethodName.Value;
@@ -62,7 +62,7 @@ namespace LegacyTestingTools
                 _currentCallLogger.Value._ignoredArguments[methodName].Add(argumentIndex);
             }
         }
-        
+
         public static void IgnoreAllArguments()
         {
             var methodName = _currentMethodName.Value;
@@ -71,7 +71,7 @@ namespace LegacyTestingTools
                 _currentCallLogger.Value._ignoredAllArguments.Add(methodName);
             }
         }
-        
+
         public static void IgnoreReturnValue()
         {
             var methodName = _currentMethodName.Value;
@@ -95,13 +95,13 @@ namespace LegacyTestingTools
             // Set up context for the target to specify constructor argument names
             CallLogFormatterContext.SetCurrentLogger(new CallLogger(_logger._storybook, _emoji));
             CallLogFormatterContext.SetCurrentMethodName("ConstructorCalledWith");
-            
+
             // Call the target's ConstructorCalledWith method to let it set argument names
             if (_target is IConstructorCalledWith constructorTarget)
             {
                 constructorTarget.ConstructorCalledWith(args);
             }
-            
+
             // Log constructor call directly with proper interface name
             var interfaceName = _interfaceName ?? typeof(T).Name;
             if (interfaceName.StartsWith("I") && interfaceName.Length > 1)
@@ -112,28 +112,29 @@ namespace LegacyTestingTools
             {
                 // Find the first interface the target implements
                 var interfaces = _target?.GetType().GetInterfaces() ?? typeof(T).GetInterfaces();
-                var mainInterface = interfaces.FirstOrDefault(i => i.Name.StartsWith("I") && i != typeof(IConstructorCalledWith));
+                var mainInterface =
+                    interfaces.FirstOrDefault(i => i.Name.StartsWith("I") && i != typeof(IConstructorCalledWith));
                 interfaceName = mainInterface?.Name ?? typeof(T).Name;
             }
 
             var callLogger = new CallLogger(_logger._storybook, _emoji);
             callLogger.forInterface(interfaceName);
-            
+
             // Add individual arguments - use names from context if available
             if (args != null)
             {
                 var constructorArgNames = CallLogFormatterContext.GetConstructorArgumentNames();
                 for (int i = 0; i < args.Length; i++)
                 {
-                    var argName = (constructorArgNames != null && i < constructorArgNames.Length) 
-                        ? constructorArgNames[i] 
+                    var argName = (constructorArgNames != null && i < constructorArgNames.Length)
+                        ? constructorArgNames[i]
                         : $"Arg{i}";
                     callLogger.withArgument(args[i], argName);
                 }
             }
-            
+
             callLogger.log("ConstructorCalledWith");
-            
+
             // Clear context
             CallLogFormatterContext.ClearCurrentLogger();
         }
@@ -148,11 +149,11 @@ namespace LegacyTestingTools
             // Create a new logger instance for this call
             var sb = new StringBuilder();
             var callLogger = new CallLogger(sb, _emoji);
-            
+
             // Set current logger context for stubs to access
             CallLogFormatterContext.SetCurrentLogger(callLogger);
             CallLogFormatterContext.SetCurrentMethodName(methodName);
-            
+
             // Invoke the actual method first to let it set context
             object? result;
             try
@@ -164,27 +165,27 @@ namespace LegacyTestingTools
                 callLogger.withNote($"Exception: {ex.Message}");
                 callLogger.log(methodName);
                 _logger._storybook.Append(sb.ToString());
-                
+
                 // Clear current logger context even on exception
                 CallLogFormatterContext.ClearCurrentLogger();
-                
+
                 throw;
             }
-            
+
             // Check if the call should be ignored (after method execution)
             if (callLogger._ignoredCalls.Contains(methodName))
             {
                 CallLogFormatterContext.ClearCurrentLogger();
                 return result;
             }
-            
+
             // Add arguments if not ignored
             if (args != null && !callLogger._ignoredAllArguments.Contains(methodName))
             {
                 var parameters = targetMethod.GetParameters();
                 for (int i = 0; i < args.Length && i < parameters.Length; i++)
                 {
-                    if (!callLogger._ignoredArguments.ContainsKey(methodName) || 
+                    if (!callLogger._ignoredArguments.ContainsKey(methodName) ||
                         !callLogger._ignoredArguments[methodName].Contains(i))
                     {
                         if (parameters[i].IsOut)
@@ -224,10 +225,10 @@ namespace LegacyTestingTools
 
             callLogger.log(methodName);
             _logger._storybook.Append(sb.ToString());
-            
+
             // Clear current logger context
             CallLogFormatterContext.ClearCurrentLogger();
-            
+
             return result;
         }
 
@@ -250,7 +251,7 @@ namespace LegacyTestingTools
         private readonly List<(string name, object? value, string emoji)> _parameters = new();
         private string? _methodName;
         private string? _forcedInterfaceName;
-        
+
         // Internal fields for ignored calls/arguments/returns (used by CallLogFormatterContext)
         internal readonly Dictionary<string, HashSet<int>> _ignoredArguments = new();
         internal readonly HashSet<string> _ignoredCalls = new();
@@ -303,7 +304,7 @@ namespace LegacyTestingTools
         public void log([CallerMemberName] string? methodName = null)
         {
             _methodName = methodName;
-            
+
             if (_methodName == "ConstructorCalledWith")
             {
                 LogConstructorCall();
@@ -312,7 +313,7 @@ namespace LegacyTestingTools
             {
                 LogMethodCall();
             }
-            
+
             // Clear parameters for next call
             _parameters.Clear();
             _returnValue = null;
@@ -324,12 +325,12 @@ namespace LegacyTestingTools
         {
             var interfaceName = _forcedInterfaceName ?? GetInterfaceName();
             _storybook.AppendLine($"{_emoji} {interfaceName} constructor called with:");
-            
+
             foreach (var (name, value, emoji) in _parameters)
             {
                 _storybook.AppendLine($"  {emoji} {name}: {value}");
             }
-            
+
             _storybook.AppendLine();
         }
 
@@ -337,7 +338,7 @@ namespace LegacyTestingTools
         {
             // Use detailed format for all calls
             _storybook.AppendLine($"{_emoji} {_methodName}:");
-            
+
             foreach (var (name, value, emoji) in _parameters)
             {
                 var formattedValue = FormatValue(value);
@@ -364,23 +365,23 @@ namespace LegacyTestingTools
             var frame = new System.Diagnostics.StackFrame(3, false);
             var method = frame.GetMethod();
             var declaringType = method?.DeclaringType;
-            
+
             if (declaringType != null)
             {
                 var interfaces = declaringType.GetInterfaces();
-                var mainInterface = interfaces.FirstOrDefault(i => i.Name.StartsWith("I") && i != typeof(IConstructorCalledWith));
+                var mainInterface =
+                    interfaces.FirstOrDefault(i => i.Name.StartsWith("I") && i != typeof(IConstructorCalledWith));
                 return mainInterface?.Name ?? declaringType.Name;
             }
-            
+
             return "Unknown";
         }
-
 
 
         private string FormatValue(object? value)
         {
             if (value == null) return "null";
-            
+
             // Handle collections (Lists, Arrays, etc.)
             if (value is System.Collections.IEnumerable enumerable && !(value is string))
             {
@@ -389,32 +390,33 @@ namespace LegacyTestingTools
                 {
                     items.Add(FormatValue(item));
                 }
+
                 return string.Join(",", items);
             }
-            
+
             // Handle decimals with invariant culture
             if (value is decimal dec)
             {
                 return dec.ToString(CultureInfo.InvariantCulture);
             }
-            
+
             // Handle dates with format matching verified.txt
             if (value is DateTime dt)
             {
                 return dt.ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
             }
-            
+
             // Handle other numeric types with invariant culture
             if (value is double d)
             {
                 return d.ToString(CultureInfo.InvariantCulture);
             }
-            
+
             if (value is float f)
             {
                 return f.ToString(CultureInfo.InvariantCulture);
             }
-            
+
             return value.ToString() ?? "null";
         }
     }

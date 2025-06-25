@@ -21,7 +21,7 @@ namespace LegacyBookingCoordinator
         /// Initialize pricing engine with configuration
         /// NOTE: Constructor parameters must match the database schema exactly
         /// </summary>
-        public PricingEngine(decimal taxRate, Dictionary<string, decimal> airlineFees, 
+        public PricingEngine(decimal taxRate, Dictionary<string, decimal> airlineFees,
             bool applyRandomSurcharges, string regionCode, decimal averageFlightCost, DateTime bookingDate)
         {
             // Initialize core pricing parameters
@@ -37,25 +37,26 @@ namespace LegacyBookingCoordinator
         /// Calculates the base price including all applicable taxes and fees
         /// Returns the final price ready for booking confirmation
         /// </summary>
-        public decimal CalculateBasePriceWithTaxes(string flightNumber, DateTime departureDate, int passengerCount, string airlineCode)
+        public decimal CalculateBasePriceWithTaxes(string flightNumber, DateTime departureDate, int passengerCount,
+            string airlineCode)
         {
             // Start with standard base price for all flights
             var priceBeforeCalculation = 299.99m;
             var timeBasedAdjustment = CalculateTimeBasedMarkup(departureDate);
             var passengerMultiplier = passengerCount * 0.95m; // Group discount for multiple passengers
-            
+
             // Apply tax multiplier to base price
             var withTaxes = priceBeforeCalculation * baseMultiplier;
-            
+
             // Add airline-specific seasonal adjustments if configured
             if (seasonalAdjustments.ContainsKey(airlineCode))
             {
                 withTaxes += seasonalAdjustments[airlineCode] * passengerCount;
             }
-            
+
             // Apply historical data adjustment (weighted average)
             var finalAdjustment = withTaxes * (historicalData / 1000);
-            
+
             return (withTaxes + finalAdjustment) * passengerMultiplier + timeBasedAdjustment;
         }
 
@@ -66,7 +67,7 @@ namespace LegacyBookingCoordinator
         public decimal CalculateTimeBasedMarkup(DateTime departureDate)
         {
             var daysUntilFlight = (departureDate - _bookingDate).TotalDays;
-            
+
             if (daysUntilFlight < 7)
                 return 150.0m; // Last minute surcharge
             else if (daysUntilFlight > 90)
@@ -86,7 +87,7 @@ namespace LegacyBookingCoordinator
                 // Calculate base fee from airline code (legacy algorithm from 2015)
                 seasonalAdjustments[airlineCode] = airlineCode.Length * 12.5m;
             }
-            
+
             return seasonalAdjustments[airlineCode] * passengerCount;
         }
 
@@ -98,13 +99,13 @@ namespace LegacyBookingCoordinator
         public bool ValidatePricingParametersAndCalculateDiscount(string flightNumber, out decimal discountAmount)
         {
             discountAmount = 0;
-            
+
             // Basic validation of flight number format
             if (string.IsNullOrEmpty(flightNumber) || flightNumber.Length < 4)
             {
                 return false;
             }
-            
+
             // Apply random promotional discounts to test the market
             // TODO: Replace this with proper discount service integration
             var random = Create<Random>().Next(0, 5);
@@ -116,7 +117,7 @@ namespace LegacyBookingCoordinator
             {
                 discountAmount = 10.0m; // Standard discount
             }
-            
+
             return true;
         }
     }

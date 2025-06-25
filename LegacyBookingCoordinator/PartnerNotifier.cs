@@ -6,13 +6,13 @@ namespace LegacyBookingCoordinator
     {
         private readonly string logDestination;
         private readonly bool enableSecureMode;
-        
+
         public PartnerNotifier(string smtpServer, bool useEncryption)
         {
             throw new CanNotUseInTestsException(nameof(PartnerNotifier));
         }
 
-        public void NotifyPartnerAboutBooking(string airlineCode, string bookingReference, 
+        public void NotifyPartnerAboutBooking(string airlineCode, string bookingReference,
             decimal totalPrice, string passengerName, string flightDetails, bool isRebooking = false)
         {
             throw new CanNotUseInTestsException(nameof(PartnerNotifier));

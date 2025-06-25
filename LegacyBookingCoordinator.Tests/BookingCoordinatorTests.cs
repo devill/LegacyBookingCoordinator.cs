@@ -17,15 +17,16 @@ namespace LegacyBookingCoordinator.Tests
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
 
+            var storybook = new StringBuilder();
+            
             var factory = ObjectFactory.Instance();
+            
             try
             {
                 factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
                 factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
                 factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
                 factory.SetOne<IAuditLogger>(new AuditLoggerStub());
-
-                var storybook = new StringBuilder();
             
                 var coordinator = new BookingCoordinator();
                 var bookingReference = coordinator.BookFlight(passengerName, flightNumber, departureDate,

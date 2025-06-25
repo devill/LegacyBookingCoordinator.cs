@@ -1,3 +1,33 @@
+/*
+ * WARNING: ABANDON ALL HOPE, YE WHO ENTER HERE
+ *
+ * This is the infamous BookingCoordinator - a monument to technical debt
+ * and a testament to what happens when deadlines triumph over design.
+ * 
+ * This code has claimed many victims. It's entangled, stateful, and has
+ * side effects that ripple through dimensions unknown to mortal developers.
+ * Every attempt to "improve" it has only made it stronger and more vengeful.
+ *
+ * The original developers have long since fled to safer pastures (or therapy).
+ * Managers have learned not to mention refactoring within earshot of this file.
+ * Even the automated tests are afraid to look directly at it.
+ *
+ * In case you decided to ignore this warning increment the counter below and sign
+ * with your name and an emoji reflecting your current mental state.
+ *
+ * You are victim: #10
+ * The knights who gave their best before you:
+ *  - Jack 🥵
+ *  - Bob 😱
+ *  - Mary 🫣
+ *  - Jack 🤬(again)
+ *  - Nathan 🥺
+ *  - Mary 🙈
+ *  - June 😵
+ *  - Nathan 🤮
+ *  - Jack 😵‍💫 (I still didn't learn my lesson)
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

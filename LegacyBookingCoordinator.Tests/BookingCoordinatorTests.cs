@@ -10,10 +10,14 @@ namespace LegacyBookingCoordinator.Tests
         public async Task BookFlight_ShouldCreateBookingSuccessfully()
         {
             // Arrange
-            var storybook = new StringBuilder();
+            var passengerName = "John Doe";
+            var flightNumber = "AA123";
+            var departureDate = new DateTime(2025, 07, 03, 12, 42, 11);
+            var passengerCount = 2;
+            var airlineCode = "AA";
+            var specialRequests = "meal,wheelchair";
 
             var factory = ObjectFactory.Instance();
-
             try
             {
                 factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
@@ -21,14 +25,9 @@ namespace LegacyBookingCoordinator.Tests
                 factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
                 factory.SetOne<IAuditLogger>(new AuditLoggerStub());
 
+                var storybook = new StringBuilder();
+            
                 var coordinator = new BookingCoordinator();
-                var passengerName = "John Doe";
-                var flightNumber = "AA123";
-                var departureDate = new DateTime(2025, 07, 03, 12, 42, 11);
-                var passengerCount = 2;
-                var airlineCode = "AA";
-                var specialRequests = "meal,wheelchair";
-
                 var bookingReference = coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests);
 

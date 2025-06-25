@@ -5,7 +5,9 @@ namespace LegacyBookingCoordinator
 {
     public interface IFlightAvailabilityService
     {
-        List<string> CheckAndGetAvailableSeatsForBooking(string flightNumber, DateTime departureDate, int passengerCount);
+        List<string> CheckAndGetAvailableSeatsForBooking(string flightNumber, DateTime departureDate,
+            int passengerCount);
+
         bool IsFlightFullyBooked(string flightNumber, DateTime departureDate);
     }
 }

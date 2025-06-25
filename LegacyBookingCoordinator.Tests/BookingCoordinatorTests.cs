@@ -17,7 +17,7 @@ namespace LegacyBookingCoordinator.Tests
             var specialRequests = "meal,wheelchair";
 
             var storybook = new StringBuilder();
-            
+
             var coordinator = new BookingCoordinator();
             coordinator.BookFlight(passengerName, flightNumber, departureDate,
                 passengerCount, airlineCode, specialRequests);
@@ -25,6 +25,5 @@ namespace LegacyBookingCoordinator.Tests
             // Assert
             await Verify(storybook.ToString());
         }
-
     }
 }

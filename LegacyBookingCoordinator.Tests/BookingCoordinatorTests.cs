@@ -1,6 +1,7 @@
 using System.Text;
 using LegacyBookingCoordinator;
 using LegacyTestingTools;
+using static LegacyTestingTools.CallLogFormatterContext;
 
 namespace LegacyBookingCoordinator.Tests
 {
@@ -12,22 +13,26 @@ namespace LegacyBookingCoordinator.Tests
             // Arrange
             var storybook = new StringBuilder();
 
+            var cl = new CallLogger(storybook);
             var factory = ObjectFactory.Instance();
 
-            try
-            {
-                factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
-                factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
-                factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
-                factory.SetOne<IAuditLogger>(new AuditLoggerStub());
+            var passengerName = "John Doe";
+            var flightNumber = "AA123";
+            var departureDate = new DateTime(2025, 07, 03, 12, 42, 11);
+            var passengerCount = 2;
+            var airlineCode = "AA";
+            var specialRequests = "meal,wheelchair";
+            var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
+            
+            var coordinator = new BookingCoordinator(bookingDate);
 
-                var coordinator = new BookingCoordinator();
-                var passengerName = "John Doe";
-                var flightNumber = "AA123";
-                var departureDate = new DateTime(2025, 07, 03, 12, 42, 11);
-                var passengerCount = 2;
-                var airlineCode = "AA";
-                var specialRequests = "meal,wheelchair";
+            try
+            { 
+                factory.SetOne(cl.Wrap<IBookingRepository>(new BookingRepositoryStub(), "💾"));
+                factory.SetOne(cl.Wrap<IPartnerNotifier>(new PartnerNotifierStub(), "📣"));
+                factory.SetOne(cl.Wrap<IAuditLogger>(new AuditLoggerStub(), "🪵"));
+                factory.SetOne(cl.Wrap<IFlightAvailabilityService>(new FlightAvailabilityServiceStub(), "✈️"));
+                factory.SetOne<Random>(new RandomStub());
 
                 var bookingReference = coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests);
@@ -45,7 +50,7 @@ namespace LegacyBookingCoordinator.Tests
 
     }
 
-    public class AuditLoggerStub : IAuditLogger
+    public class AuditLoggerStub : IAuditLogger,  IConstructorCalledWith
     {
         public void LogBookingActivity(string activity, string bookingReference, string userInfo)
         {
@@ -66,9 +71,14 @@ namespace LegacyBookingCoordinator.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void ConstructorCalledWith(params object[] args)
+        {
+            SetConstructorArgumentNames("logDirectory", "verboseMode");
+        }
     }
 
-    public class PartnerNotifierStub : IPartnerNotifier
+    public class PartnerNotifierStub : IPartnerNotifier,  IConstructorCalledWith
     {
         public void NotifyPartnerAboutBooking(string airlineCode, string bookingReference, decimal totalPrice, string passengerName,
             string flightDetails, bool isRebooking = false)
@@ -85,9 +95,14 @@ namespace LegacyBookingCoordinator.Tests
         {
             
         }
+
+        public void ConstructorCalledWith(params object[] args)
+        {
+            SetConstructorArgumentNames("smtpServer", "useEncryption");
+        }
     }
 
-    public class FlightAvailabilityServiceStub : IFlightAvailabilityService
+    public class FlightAvailabilityServiceStub : IFlightAvailabilityService, IConstructorCalledWith
     {
         public List<string> CheckAndGetAvailableSeatsForBooking(string flightNumber, DateTime departureDate, int passengerCount)
         {
@@ -98,13 +113,18 @@ namespace LegacyBookingCoordinator.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void ConstructorCalledWith(params object[] args)
+        {
+            SetConstructorArgumentNames("connectionString");
+        }
     }
 
-    public class BookingRepositoryStub : IBookingRepository
+    public class BookingRepositoryStub : IBookingRepository, IConstructorCalledWith
     {
         public string SaveBookingDetails(string passengerName, string flightDetails, decimal price, DateTime bookingDate)
         {
-            return "APPLE3.14";
+            return "DRW6N";
         }
 
         public Dictionary<string, object> GetBookingInfo(string bookingReference)
@@ -120,6 +140,19 @@ namespace LegacyBookingCoordinator.Tests
         public decimal GetHistoricalPricingData(string flightNumber, DateTime date, int dayRange)
         {
             throw new NotImplementedException();
+        }
+
+        public void ConstructorCalledWith(params object[] args)
+        {
+            SetConstructorArgumentNames("dbConnectionString", "maxRetries");
+        }
+    }
+    
+    public class RandomStub : Random
+    {
+        public override int Next(int minValue, int maxValue)
+        {
+            return 3;
         }
     }
 }

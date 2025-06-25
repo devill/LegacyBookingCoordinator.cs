@@ -9,9 +9,6 @@ namespace LegacyBookingCoordinator.Tests
         public async Task BookFlight_ShouldCreateBookingSuccessfully()
         {
             // Arrange
-            var storybook = new StringBuilder();
-            
-            var coordinator = new BookingCoordinator();
             var passengerName = "John Doe";
             var flightNumber = "AA123";
             var departureDate = new DateTime(2025, 07, 03, 12, 42, 11);
@@ -19,6 +16,9 @@ namespace LegacyBookingCoordinator.Tests
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
 
+            var storybook = new StringBuilder();
+            
+            var coordinator = new BookingCoordinator();
             coordinator.BookFlight(passengerName, flightNumber, departureDate,
                 passengerCount, airlineCode, specialRequests);
 

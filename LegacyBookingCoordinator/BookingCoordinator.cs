@@ -33,7 +33,7 @@ namespace LegacyBookingCoordinator
             var maxRetries = CalculateRetriesBasedOnBookingCount(); // Dynamic retry calculation
             
             // Create repository with calculated parameters
-            var repository = new BookingRepository(connectionString, maxRetries);
+            var repository = Create<IBookingRepository,BookingRepository>(connectionString, maxRetries);
             
             // Calculate pricing engine parameters based on current state
             var taxRate = CalculateTaxRateBasedOnGlobalState(airlineCode);
@@ -45,7 +45,7 @@ namespace LegacyBookingCoordinator
             var pricingEngine = new PricingEngine(taxRate, airlineFees, enableRandomSurcharges, regionCode, historicalAverage);
             
             var availabilityConnectionString = ModifyConnectionStringForAvailability(connectionString, flightNumber);
-            var availabilityService = new FlightAvailabilityService(availabilityConnectionString);
+            var availabilityService = Create<IFlightAvailabilityService,FlightAvailabilityService>(availabilityConnectionString);
             
             var availableSeats = availabilityService.CheckAndGetAvailableSeatsForBooking(flightNumber, departureDate, passengerCount);
             if (availableSeats.Count < passengerCount)
@@ -75,12 +75,12 @@ namespace LegacyBookingCoordinator
             // Configure partner notification settings
             var smtpServer = DetermineSmtpServerFromAirlineCode(airlineCode);
             var useEncryption = bookingCounter % 2 == 0; // Alternate encryption for load balancing
-            var partnerNotifier = new PartnerNotifier(smtpServer, useEncryption);
+            var partnerNotifier = Create<IPartnerNotifier,PartnerNotifier>(smtpServer, useEncryption);
             
             // Setup audit logging with dynamic configuration
             var logDirectory = CalculateLogDirectoryFromBookingCount();
             var verboseMode = temporaryData.ContainsKey("debugMode"); // Enable verbose mode if debug flag set
-            var auditLogger = new AuditLogger(logDirectory, verboseMode);
+            var auditLogger = Create<IAuditLogger,AuditLogger>(logDirectory, verboseMode);
             
             // Generate unique booking reference
             var bookingReference = GenerateBookingReferenceAndUpdateCounters(passengerName, flightNumber);

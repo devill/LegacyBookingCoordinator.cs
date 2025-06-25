@@ -18,16 +18,16 @@ namespace LegacyBookingCoordinator.Tests
             var specialRequests = "meal,wheelchair";
 
             var storybook = new StringBuilder();
-            
+
             var factory = ObjectFactory.Instance();
-            
+
             try
             {
                 factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
                 factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
                 factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
                 factory.SetOne<IAuditLogger>(new AuditLoggerStub());
-            
+
                 var coordinator = new BookingCoordinator();
                 var bookingReference = coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests);
@@ -42,19 +42,16 @@ namespace LegacyBookingCoordinator.Tests
                 factory.ClearAll();
             }
         }
-
     }
 
     public class AuditLoggerStub : IAuditLogger
     {
         public void LogBookingActivity(string activity, string bookingReference, string userInfo)
         {
-            
         }
 
         public void RecordPricingCalculation(string calculationDetails, decimal finalPrice, string flightInfo)
         {
-            
         }
 
         public void LogErrorWithAlert(Exception ex, string context, string bookingRef)
@@ -70,10 +67,10 @@ namespace LegacyBookingCoordinator.Tests
 
     public class PartnerNotifierStub : IPartnerNotifier
     {
-        public void NotifyPartnerAboutBooking(string airlineCode, string bookingReference, decimal totalPrice, string passengerName,
+        public void NotifyPartnerAboutBooking(string airlineCode, string bookingReference, decimal totalPrice,
+            string passengerName,
             string flightDetails, bool isRebooking = false)
         {
-            
         }
 
         public bool ValidateAndNotifySpecialRequests(string airlineCode, string specialRequests, string bookingRef)
@@ -83,13 +80,13 @@ namespace LegacyBookingCoordinator.Tests
 
         public void UpdatePartnerBookingStatus(string airlineCode, string bookingRef, string newStatus)
         {
-            
         }
     }
 
     public class FlightAvailabilityServiceStub : IFlightAvailabilityService
     {
-        public List<string> CheckAndGetAvailableSeatsForBooking(string flightNumber, DateTime departureDate, int passengerCount)
+        public List<string> CheckAndGetAvailableSeatsForBooking(string flightNumber, DateTime departureDate,
+            int passengerCount)
         {
             return ["11A", "11B"];
         }
@@ -102,7 +99,8 @@ namespace LegacyBookingCoordinator.Tests
 
     public class BookingRepositoryStub : IBookingRepository
     {
-        public string SaveBookingDetails(string passengerName, string flightDetails, decimal price, DateTime bookingDate)
+        public string SaveBookingDetails(string passengerName, string flightDetails, decimal price,
+            DateTime bookingDate)
         {
             return "APPLE3.14";
         }
@@ -112,7 +110,8 @@ namespace LegacyBookingCoordinator.Tests
             throw new NotImplementedException();
         }
 
-        public bool ValidateAndEnrichBookingData(string bookingRef, out decimal actualPrice, out string enrichedFlightInfo)
+        public bool ValidateAndEnrichBookingData(string bookingRef, out decimal actualPrice,
+            out string enrichedFlightInfo)
         {
             throw new NotImplementedException();
         }

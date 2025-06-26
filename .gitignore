@@ -12,6 +12,10 @@ obj/
 # Verify Test Files
 *.received.*
 
+# Test and Coverage Reports
+TestResults/
+CoverageReport/
+
 # OS Files
 .DS_Store
 Thumbs.db

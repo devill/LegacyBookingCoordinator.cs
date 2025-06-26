@@ -380,7 +380,7 @@ namespace LegacyTestingTools.Tests
             var wrappedService = logger.Wrap<IComplexArgumentService>(mockService, "🧩");
 
             var dict = new Dictionary<string, object> { { "key", "value" } };
-            wrappedService.ComplexMethod(dict, null, DateTime.Now);
+            wrappedService.ComplexMethod(dict, null, new DateTime(2025, 07, 03, 12, 42, 11));
 
             await Verify(storybook.ToString());
         }

@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using SpecRec;
 using VerifyXunit;
 using Xunit;
 
@@ -386,11 +387,38 @@ namespace LegacyTestingTools.Tests
         }
 
         [Fact]
+        public async Task CallLoggerProxy_WithAutoParameterNames_ShouldUseActualParameterNames()
+        {
+            var storybook = new StringBuilder();
+            var logger = new CallLogger(storybook);
+            var factory = ObjectFactory.Instance();
+
+            try
+            {
+                // Create a proxy that ObjectFactory will use when creating the service
+                var stubService = new AutoParameterNamesService("stub", 0);
+                var wrappedService = logger.Wrap<IAutoParameterNamesService>(stubService, "🔧");
+                factory.SetAlways<IAutoParameterNamesService>(wrappedService);
+
+                // Now when ObjectFactory creates the service, it should trigger ConstructorCalledWith
+                var createdService = factory.Create<IAutoParameterNamesService, AutoParameterNamesService>("dbConnection", 5432);
+
+                createdService.DoWork();
+
+                await Verify(storybook.ToString());
+            }
+            finally
+            {
+                factory.ClearAll();
+            }
+        }
+
+        [Fact]
         public async Task CallLoggerProxy_IntegratedWithObjectFactory_ShouldLogConstructorCalls()
         {
             var storybook = new StringBuilder();
             var logger = new CallLogger(storybook);
-            var factory = new ObjectFactory();
+            var factory = ObjectFactory.Instance();
 
             try
             {
@@ -496,7 +524,7 @@ namespace LegacyTestingTools.Tests
 
         public void DoWork() { }
 
-        public void ConstructorCalledWith(params object[] args)
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
         {
             CallLogFormatterContext.SetConstructorArgumentNames("configPath", "portNumber");
         }
@@ -558,7 +586,7 @@ namespace LegacyTestingTools.Tests
         public void ComplexMethod() { }
         public void Dispose() { }
 
-        public void ConstructorCalledWith(params object[] args)
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
         {
             CallLogFormatterContext.SetConstructorArgumentNames("complexParam1", "complexParam2");
         }
@@ -585,7 +613,7 @@ namespace LegacyTestingTools.Tests
 
         public void DoOperation() { }
 
-        public void ConstructorCalledWith(params object[] args)
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
         {
             CallLogFormatterContext.SetConstructorArgumentNames("connectionString", "portNumber", "sslEnabled");
         }
@@ -658,5 +686,23 @@ namespace LegacyTestingTools.Tests
     public class ComplexArgumentService : IComplexArgumentService
     {
         public void ComplexMethod(Dictionary<string, object> dict, object? nullValue, DateTime timestamp) { }
+    }
+
+    public interface IAutoParameterNamesService
+    {
+        void DoWork();
+    }
+
+    public class AutoParameterNamesService : IAutoParameterNamesService, IConstructorCalledWith
+    {
+        public AutoParameterNamesService(string connectionString, int port) { }
+
+        public void DoWork() { }
+
+        // Intentionally does NOT call SetConstructorArgumentNames to test automatic parameter naming
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
+        {
+            // Do nothing - this will test the fallback to actual parameter names
+        }
     }
 }

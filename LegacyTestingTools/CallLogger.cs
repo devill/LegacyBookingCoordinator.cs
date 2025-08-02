@@ -97,7 +97,7 @@ namespace LegacyTestingTools
             SetupContextForTarget(args);
             NotifyTargetOfConstructorCall(parameters);
             var interfaceName = DetermineInterfaceName();
-            LogConstructorCall(interfaceName, args);
+            LogConstructorCall(interfaceName, parameters);
             CallLogFormatterContext.ClearCurrentLogger();
         }
 
@@ -138,32 +138,33 @@ namespace LegacyTestingTools
             return mainInterface?.Name ?? typeof(T).Name;
         }
 
-        private void LogConstructorCall(string interfaceName, object[] args)
+        private void LogConstructorCall(string interfaceName, ConstructorParameterInfo[] parameters)
         {
             var callLogger = new CallLogger(_logger._storybook, _emoji);
             callLogger.forInterface(interfaceName);
 
-            AddConstructorArguments(callLogger, args);
+            AddConstructorArguments(callLogger, parameters);
             callLogger.log("ConstructorCalledWith");
         }
 
-        private void AddConstructorArguments(CallLogger callLogger, object[] args)
+        private void AddConstructorArguments(CallLogger callLogger, ConstructorParameterInfo[] parameters)
         {
-            if (args == null) return;
+            if (parameters == null) return;
 
             var constructorArgNames = CallLogFormatterContext.GetConstructorArgumentNames();
-            for (int i = 0; i < args.Length; i++)
+            for (int i = 0; i < parameters.Length; i++)
             {
-                var argName = GetArgumentName(constructorArgNames, i);
-                callLogger.withArgument(args[i], argName);
+                var parameter = parameters[i];
+                var argName = GetArgumentName(constructorArgNames, i, parameter.Name);
+                callLogger.withArgument(parameter.Value, argName);
             }
         }
 
-        private string GetArgumentName(string[]? constructorArgNames, int index)
+        private string GetArgumentName(string[]? constructorArgNames, int index, string actualParameterName)
         {
             return (constructorArgNames != null && index < constructorArgNames.Length)
                 ? constructorArgNames[index]
-                : $"Arg{index}";
+                : actualParameterName ?? $"Arg{index}";
         }
 
 

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using SpecRec;
 
 namespace LegacyTestingTools
 {
@@ -90,10 +91,11 @@ namespace LegacyTestingTools
         private string _emoji = "";
         private string? _interfaceName;
 
-        public void ConstructorCalledWith(params object[] args)
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
         {
+            var args = parameters.Select(p => p.Value).ToArray();
             SetupContextForTarget(args);
-            NotifyTargetOfConstructorCall(args);
+            NotifyTargetOfConstructorCall(parameters);
             var interfaceName = DetermineInterfaceName();
             LogConstructorCall(interfaceName, args);
             CallLogFormatterContext.ClearCurrentLogger();
@@ -105,11 +107,11 @@ namespace LegacyTestingTools
             CallLogFormatterContext.SetCurrentMethodName("ConstructorCalledWith");
         }
 
-        private void NotifyTargetOfConstructorCall(object[] args)
+        private void NotifyTargetOfConstructorCall(ConstructorParameterInfo[] parameters)
         {
             if (_target is IConstructorCalledWith constructorTarget)
             {
-                constructorTarget.ConstructorCalledWith(args);
+                constructorTarget.ConstructorCalledWith(parameters);
             }
         }
 

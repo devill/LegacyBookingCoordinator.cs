@@ -1,6 +1,6 @@
 using System.Text;
-using LegacyBookingCoordinator;
 using LegacyTestingTools;
+using SpecRec;
 using static LegacyTestingTools.CallLogFormatterContext;
 
 namespace LegacyBookingCoordinator.Tests
@@ -68,9 +68,9 @@ namespace LegacyBookingCoordinator.Tests
             throw new NotImplementedException();
         }
 
-        public void ConstructorCalledWith(params object[] args)
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
         {
-            SetConstructorArgumentNames("logDirectory", "verboseMode");
+            
         }
     }
 
@@ -91,9 +91,9 @@ namespace LegacyBookingCoordinator.Tests
         {
         }
 
-        public void ConstructorCalledWith(params object[] args)
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
         {
-            SetConstructorArgumentNames("smtpServer", "useEncryption");
+            
         }
     }
 
@@ -110,9 +110,9 @@ namespace LegacyBookingCoordinator.Tests
             throw new NotImplementedException();
         }
 
-        public void ConstructorCalledWith(params object[] args)
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
         {
-            SetConstructorArgumentNames("connectionString");
+            
         }
     }
 
@@ -143,6 +143,11 @@ namespace LegacyBookingCoordinator.Tests
         public void ConstructorCalledWith(params object[] args)
         {
             SetConstructorArgumentNames("dbConnectionString", "maxRetries");
+        }
+
+        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
+        {
+            
         }
     }
 

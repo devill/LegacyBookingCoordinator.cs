@@ -1,6 +1,5 @@
 using System.Text;
-using LegacyBookingCoordinator;
-using LegacyTestingTools;
+using SpecRec;
 
 namespace LegacyBookingCoordinator.Tests
 {

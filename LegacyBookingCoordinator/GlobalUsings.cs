@@ -1,1 +1,1 @@
-global using static LegacyTestingTools.ObjectCreation;
+global using static SpecRec.GlobalObjectFactory;

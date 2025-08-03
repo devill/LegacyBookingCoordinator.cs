@@ -135,7 +135,7 @@ service.SendEmail("user@example.com", "Welcome!");
 Use the static `CallLogFormatterContext` methods inside your stub methods to control logging:
 
 ```csharp
-using static LegacyTestingTools.CallLogFormatterContext;
+using static SpecRec.CallLogFormatterContext;
 using SpecRec;
 
 public class EmailServiceStub : IEmailService, IConstructorCalledWith

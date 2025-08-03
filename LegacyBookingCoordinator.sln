@@ -5,10 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyBookingCoordinator", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyBookingCoordinator.Tests", "LegacyBookingCoordinator.Tests\LegacyBookingCoordinator.Tests.csproj", "{C872FCEE-8310-4CEC-A69F-4063FD17E757}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyTestingTools", "LegacyTestingTools\LegacyTestingTools.csproj", "{4F9E2485-C06B-4A75-B4A1-FB39395E9F7B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyTestingTools.Tests", "LegacyTestingTools.Tests\LegacyTestingTools.Tests.csproj", "{EB4892F1-4205-4D7D-BCE9-D25BB1E47499}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,13 +19,5 @@ Global
 		{C872FCEE-8310-4CEC-A69F-4063FD17E757}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C872FCEE-8310-4CEC-A69F-4063FD17E757}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C872FCEE-8310-4CEC-A69F-4063FD17E757}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F9E2485-C06B-4A75-B4A1-FB39395E9F7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F9E2485-C06B-4A75-B4A1-FB39395E9F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F9E2485-C06B-4A75-B4A1-FB39395E9F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F9E2485-C06B-4A75-B4A1-FB39395E9F7B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB4892F1-4205-4D7D-BCE9-D25BB1E47499}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB4892F1-4205-4D7D-BCE9-D25BB1E47499}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB4892F1-4205-4D7D-BCE9-D25BB1E47499}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB4892F1-4205-4D7D-BCE9-D25BB1E47499}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

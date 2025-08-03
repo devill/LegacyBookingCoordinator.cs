@@ -1,7 +1,5 @@
 using System.Text;
-using LegacyTestingTools;
 using SpecRec;
-using static LegacyTestingTools.CallLogFormatterContext;
 
 namespace LegacyBookingCoordinator.Tests
 {
@@ -138,11 +136,6 @@ namespace LegacyBookingCoordinator.Tests
         public decimal GetHistoricalPricingData(string flightNumber, DateTime date, int dayRange)
         {
             throw new NotImplementedException();
-        }
-
-        public void ConstructorCalledWith(params object[] args)
-        {
-            SetConstructorArgumentNames("dbConnectionString", "maxRetries");
         }
 
         public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)

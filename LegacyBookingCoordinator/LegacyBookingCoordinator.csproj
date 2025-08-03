@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-      <ProjectReference Include="..\LegacyTestingTools\LegacyTestingTools.csproj" />
-      <PackageReference Include="SpecRec" Version="0.0.1" />
+      <PackageReference Include="SpecRec" Version="0.0.2" />
     </ItemGroup>
 
     <PropertyGroup>

@@ -95,7 +95,7 @@ Create<YourClass>(constructor, arguments);
 
 ## 📦 Prerequisites
 
-This kata requires the **SpecRec** NuGet package (version 0.0.1 or later) which provides the enhanced ObjectFactory and related testing utilities.
+This kata requires the **SpecRec** NuGet package (version 0.0.3 or later) which provides the enhanced ObjectFactory and related testing utilities.
 
 ⚠️ **Important**: All tests that rely on the singleton instance of `ObjectFactory` should call `ObjectFactory.Instance().ClearAll()` to make sure tests remain independent.
 

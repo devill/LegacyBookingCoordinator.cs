@@ -44,7 +44,7 @@ This is **impossible** without changing the code. With `ObjectFactory`, you can 
 
 Did you ever run into a codebase so awkward and full of hard to override dependencies that even the thought of writing a test is daunting?
 
-The `ObjectFactory` is meant to solve this problem. It is a simple class that acts as a drop-in replacement for the `new` keyword, allowing you to control object creation in tests.
+The `ObjectFactory` solves this problem. It acts as a drop-in replacement for the `new` keyword, allowing you to control object creation in tests.
 
 Instead of:
 ```csharp
@@ -73,7 +73,13 @@ factory.SetOne<PricingEngine>(new FakePricingEngine());
 
 #### Constructor arguments
 
-If you want to test constructor arguments make sure your test double implements `IConstructorCalledWith`. If it does the `ConstructorCalledWith` method will get called with the constructor arguments upon object creation.
+If you want to test constructor arguments make sure your test double implements `IConstructorCalledWith`. If it does the `ConstructorCalledWith` method will get called with the constructor parameters upon object creation.
+
+```csharp
+public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
+```
+
+Each `ConstructorParameterInfo` contains the parameter name and value, allowing for better test logging and verification.
 
 #### Singleton instance
 
@@ -82,10 +88,14 @@ You can either inject an instance of the factory (harder, but better long term) 
 ObjectFactory.Instance().Create<YourClass>(constructor, arguments);
 ```
 
-Or use the shorthand:
+Or use the shorthand (requires `using static SpecRec.GlobalObjectFactory;`):
 ```
 Create<YourClass>(constructor, arguments);
 ```
+
+## 📦 Prerequisites
+
+This kata requires the **SpecRec** NuGet package (version 0.0.1 or later) which provides the enhanced ObjectFactory and related testing utilities.
 
 ⚠️ **Important**: All tests that rely on the singleton instance of `ObjectFactory` should call `ObjectFactory.Instance().ClearAll()` to make sure tests remain independent.
 
@@ -126,6 +136,7 @@ Use the static `CallLogFormatterContext` methods inside your stub methods to con
 
 ```csharp
 using static LegacyTestingTools.CallLogFormatterContext;
+using SpecRec;
 
 public class EmailServiceStub : IEmailService, IConstructorCalledWith
 {
@@ -145,10 +156,9 @@ public class EmailServiceStub : IEmailService, IConstructorCalledWith
         IgnoreCall();
     }
     
-    public void ConstructorCalledWith(params object[] args)
+    public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
     {
-        // Provide meaningful parameter names
-        SetConstructorArgumentNames("smtpServer", "port");
+
     }
 }
 ```
@@ -160,7 +170,7 @@ public class EmailServiceStub : IEmailService, IConstructorCalledWith
 - `IgnoreArgument(int index)` - Hide specific arguments by index
 - `IgnoreAllArguments()` - Hide all arguments for the current method
 - `IgnoreReturnValue()` - Hide the return value
-- `SetConstructorArgumentNames(params string[] names)` - Provide meaningful parameter names for constructor calls
+- `SetConstructorArgumentNames(params string[] names)` - Provide meaningful parameter names for constructor calls if matching constructor does not exists (Should almost never be used.)
 
 ## 🥇 Cover all paths
 

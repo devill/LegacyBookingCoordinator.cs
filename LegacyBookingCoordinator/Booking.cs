@@ -39,11 +39,11 @@ namespace LegacyBookingCoordinator
             
             if (!string.IsNullOrEmpty(SpecialRequests))
             {
-                result.AppendLine($"🎯 {SpecialRequests}");
+                result.AppendLine($"  🎯 {SpecialRequests}");
             }
             
-            result.AppendLine($"📝 {BookingDate:yyyy-MM-dd HH:mm}");
-            result.Append($"✅ {Status}");
+            result.AppendLine($"  📝 {BookingDate:yyyy-MM-dd HH:mm}");
+            result.Append($"  ✅ {Status}");
             
             return result.ToString();
         }

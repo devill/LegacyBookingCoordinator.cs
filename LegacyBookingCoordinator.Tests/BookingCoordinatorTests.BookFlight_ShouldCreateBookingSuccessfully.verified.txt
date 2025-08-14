@@ -1,1 +1,10 @@
-﻿Final booking reference returned: APPLE3.14
+﻿New booking: APPLE3.14
+  👤 John Doe
+  ✈️ AA123
+  📅 2025-07-03 12:42
+  👥 2
+  🏢 AA
+  💰 $1371,37
+🎯 meal,wheelchair
+📝 2025-08-14 20:36
+✅ CONFIRMED_PREMIUM

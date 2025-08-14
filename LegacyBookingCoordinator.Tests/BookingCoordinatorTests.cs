@@ -15,6 +15,7 @@ namespace LegacyBookingCoordinator.Tests
             var passengerCount = 2;
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
+            var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
 
             var storybook = new StringBuilder();
 
@@ -26,8 +27,9 @@ namespace LegacyBookingCoordinator.Tests
                 factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
                 factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
                 factory.SetOne<IAuditLogger>(new AuditLoggerStub());
+                factory.SetOne<Random>(new RandomStub());
 
-                var coordinator = new BookingCoordinator();
+                var coordinator = new BookingCoordinator(bookingDate);
                 var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests);
 
@@ -118,6 +120,14 @@ namespace LegacyBookingCoordinator.Tests
         public decimal GetHistoricalPricingData(string flightNumber, DateTime date, int dayRange)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class RandomStub : Random
+    {
+        public override int Next(int minValue, int maxValue)
+        {
+            return 3;
         }
     }
 }

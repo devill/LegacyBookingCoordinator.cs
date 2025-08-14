@@ -41,12 +41,23 @@ namespace LegacyBookingCoordinator
     /// </summary>
     public class BookingCoordinator
     {
+        private readonly DateTime _bookingDate;
         private string lastBookingRef; // Stores reference for debugging purposes
         private int bookingCounter = 1; // Global counter for booking sequence
         private bool isProcessingBooking = false; // Thread safety flag (NOTE: not actually thread-safe)
 
         private Dictionary<string, object>
             temporaryData = new Dictionary<string, object>(); // Temporary storage for calculation intermediates
+
+        public BookingCoordinator(DateTime bookingDate)
+        {
+            _bookingDate = bookingDate;
+        }
+
+        public BookingCoordinator()
+        {
+            _bookingDate = DateTime.Now;
+        }
 
         /// <summary>
         /// Main entry point for flight booking process
@@ -75,7 +86,7 @@ namespace LegacyBookingCoordinator
             var historicalAverage = GetHistoricalAverageFromRepository(repository, flightNumber);
 
             var pricingEngine = new PricingEngine(taxRate, airlineFees, enableRandomSurcharges, regionCode,
-                historicalAverage);
+                historicalAverage, _bookingDate);
 
             var availabilityConnectionString = ModifyConnectionStringForAvailability(connectionString, flightNumber);
             var availabilityService =
@@ -125,7 +136,7 @@ namespace LegacyBookingCoordinator
             // Save booking details
             var actualBookingRef = repository.SaveBookingDetails(passengerName,
                 $"{flightNumber} on {departureDate:yyyy-MM-dd} for {passengerCount} passengers",
-                finalPrice, DateTime.Now);
+                finalPrice, _bookingDate);
 
             // Log the booking activity
             auditLogger.LogBookingActivity("Flight Booked", actualBookingRef,
@@ -152,11 +163,11 @@ namespace LegacyBookingCoordinator
             partnerNotifier.UpdatePartnerBookingStatus(airlineCode, actualBookingRef, bookingStatus);
 
             temporaryData["lastBookingPrice"] = finalPrice;
-            temporaryData["lastBookingDate"] = DateTime.Now;
+            temporaryData["lastBookingDate"] = _bookingDate;
             isProcessingBooking = false;
 
             return new Booking(actualBookingRef, passengerName, flightNumber, departureDate,
-                passengerCount, airlineCode, finalPrice, specialRequests, DateTime.Now, bookingStatus);
+                passengerCount, airlineCode, finalPrice, specialRequests, _bookingDate, bookingStatus);
         }
 
         private int CalculateRetriesBasedOnBookingCount()

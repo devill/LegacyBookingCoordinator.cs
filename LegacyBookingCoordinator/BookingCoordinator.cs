@@ -61,10 +61,10 @@ namespace LegacyBookingCoordinator
 
         /// <summary>
         /// Main entry point for flight booking process
-        /// Coordinates all services and returns booking reference number
+        /// Coordinates all services and returns booking object
         /// WARNING: This method is not thread-safe due to shared state
         /// </summary>
-        public string BookFlight(string passengerName, string flightNumber, DateTime departureDate,
+        public Booking BookFlight(string passengerName, string flightNumber, DateTime departureDate,
             int passengerCount, string airlineCode, string specialRequests = "")
         {
             // Set processing flag to prevent concurrent access
@@ -166,7 +166,8 @@ namespace LegacyBookingCoordinator
             temporaryData["lastBookingDate"] = _bookingDate;
             isProcessingBooking = false;
 
-            return actualBookingRef;
+            return new Booking(actualBookingRef, passengerName, flightNumber, departureDate,
+                passengerCount, airlineCode, finalPrice, specialRequests, _bookingDate, bookingStatus);
         }
 
         private int CalculateRetriesBasedOnBookingCount()

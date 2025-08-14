@@ -31,10 +31,10 @@ namespace LegacyBookingCoordinator.Tests
                 factory.SetOne<Random>(new RandomStub());
 
                 var coordinator = new BookingCoordinator(bookingDate);
-                var bookingReference = coordinator.BookFlight(passengerName, flightNumber, departureDate,
+                var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests);
 
-                storybook.AppendLine($"Final booking reference returned: {bookingReference}");
+                storybook.AppendLine(booking.ToString());
 
                 // Assert
                 await Verify(storybook.ToString());

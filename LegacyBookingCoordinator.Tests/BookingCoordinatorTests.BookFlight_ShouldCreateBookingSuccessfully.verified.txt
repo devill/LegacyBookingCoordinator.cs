@@ -55,4 +55,13 @@
   🔸 bookingRef: DRW6N
   🔸 newStatus: CONFIRMED_PREMIUM
 
-Final booking reference returned: DRW6N
+New booking: DRW6N
+  👤 John Doe
+  ✈️ AA123
+  📅 2025-07-03 12:42
+  👥 2
+  🏢 AA
+  💰 $1161,37
+  🎯 meal,wheelchair
+  📝 2025-03-04 14:00
+  ✅ CONFIRMED_PREMIUM

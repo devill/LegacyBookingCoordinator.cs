@@ -19,7 +19,7 @@ namespace LegacyBookingCoordinator.Tests
             var storybook = new StringBuilder();
 
             var coordinator = new BookingCoordinator();
-            coordinator.BookFlight(passengerName, flightNumber, departureDate,
+            var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
                 passengerCount, airlineCode, specialRequests);
 
             // Assert

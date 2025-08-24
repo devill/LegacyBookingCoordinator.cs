@@ -31,6 +31,8 @@ The booking system coordinates:
 
 ## 🥉 Inject dependencies 
 
+Did you ever run into a codebase so awkward and full of hard to override dependencies that even the thought of writing a test is daunting? When the dreaded `new` keyword liters a codebase, writing tests after the fact is a nightmare. Luckily, the `ObjectFactory` can help you out.
+
 ### 🔧 Task
 
 Use the `ObjectFactory` to write a test for `BookingCoordinator.BookFlight()` that:
@@ -42,9 +44,7 @@ This is **impossible** without changing the code. With `ObjectFactory`, you can 
 
 ### 🏭 Concept: ObjectFactory
 
-Did you ever run into a codebase so awkward and full of hard to override dependencies that even the thought of writing a test is daunting?
-
-The `ObjectFactory` solves this problem. It acts as a drop-in replacement for the `new` keyword, allowing you to control object creation in tests.
+The `ObjectFactory` acts as a drop-in replacement for the `new` keyword, allowing you to control object creation in tests.
 
 Instead of:
 ```csharp
@@ -103,6 +103,8 @@ This kata requires the **SpecRec** NuGet package (version 0.0.3 or later) which 
 
 ## 🥈 Test the interactions
 
+Now that you can inject dependencies, you have another problem: how do you implement test doubles and end up with an easy-to-read test? Setting up multiple mocks can become very time-consuming, but with a `CallLogger` it's easy. 
+
 ### 🛠️ Task
 
 Improve the test for `BookingCoordinator.BookFlight()` so that:
@@ -111,11 +113,9 @@ Improve the test for `BookingCoordinator.BookFlight()` so that:
 * It checks price calculation is correct.
 * Verifies logging occurred.
 
-Writing a test like that with conventional methods is tedious. Use the `CallLogger` to create a storybook of calls.
+Use the `CallLogger` to create a storybook of calls and check the result using `Verify`. 
 
 ### ☎️ Concept: CallLogger
-
-Now that you can inject dependencies you have another problem: how do you implement test doubles and end up with an easy-to-read test?
 
 The CallLogger uses automatic wrapping to log all method calls:
 
@@ -130,142 +130,89 @@ var service = callLogger.Wrap<IEmailService>(new EmailServiceStub(), "📧");
 service.SendEmail("user@example.com", "Welcome!");
 ```
 
-#### Controlling What Gets Logged
+## 🏅 Eliminate stub implementations
 
-Use the static `CallLogFormatterContext` methods inside your stub methods to control logging:
+Writing stub implementations for every dependency gets tedious fast. But did you notice that the call logs actually contain the return values? What if you the return values were parsed from the latest verified call log? That is what the `Parrot` test double does for you.
 
+### 🎯 Task
+
+Replace your `CallLogger` wrapped stubs with `Parrot` test doubles that automatically replay method interactions from verified files. This eliminates the need to write and maintain stub implementations entirely.
+
+Your current test probably looks something like this:
+
+### 🦜 Concept: Parrot
+
+For the parrot to you will need a CallLog instead of the string writer:
 ```csharp
-using static SpecRec.CallLogFormatterContext;
-using SpecRec;
-
-public class EmailServiceStub : IEmailService, IConstructorCalledWith
-{
-    public void SendEmail(string recipient, string message)
-    {
-        // Add contextual information
-        AddNote("Email sent to external SMTP server");
-        
-        // Hide sensitive information
-        if (recipient.Contains("admin"))
-            IgnoreAllArguments();
-    }
-    
-    public void InternalCleanup()
-    {
-        // Skip logging internal methods
-        IgnoreCall();
-    }
-    
-    public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
-    {
-
-    }
-}
+var callLog = CallLog.FromVerifiedFile();
 ```
 
-#### Available CallLogFormatterContext Methods
+Now instead of implementing stubs, you can let Parrot repla values from verified files:
 
-- `AddNote(string note)` - Add explanatory notes to method calls
-- `IgnoreCall()` - Skip logging the current method call entirely
-- `IgnoreArgument(int index)` - Hide specific arguments by index
-- `IgnoreAllArguments()` - Hide all arguments for the current method
-- `IgnoreReturnValue()` - Hide the return value
-- `SetConstructorArgumentNames(params string[] names)` - Provide meaningful parameter names for constructor calls if matching constructor does not exists (Should almost never be used.)
+```csharp
+factory.SetOne(Parrot.Create<IBookingRepository>(callLog, "💾"));
+```
 
-## 🥇 Cover all paths
+You can add your own lines just as with the string writer:
 
-### 🚜 Task
+```csharp
+callLog.AppendLine(booking.ToString());
+```
 
-Now that you have one test, you are on your way. However, writing a large number of similar tests can become tedious. Use a data provider and default values to build a comprehensive test suite for `BookingCoordinator`.
+But you need to verify the result slightly differently: 
 
-### 📀 Data Provider (xUnit Theory)
+```csharp
+await callLog.Verify();
+```
 
-Instead of writing multiple similar tests, use xUnit's `[Theory]` and `[InlineData]` attributes to test multiple scenarios:
+Normally the first run throws a `ParrotMissingReturnValueException`. Fill in return values in the `.received.txt` file, rename to `.verified.txt`. Repeat until green.
+
+However, since you already have a verified call log with return values, the test should pass right away. 
+
+
+## 💎 Comprehensive scenario testing
+
+By now we have one test, but oh no... we need more. 😩 Don't worry, it won't take forever! Now that we read values from the verified call logs, we can have multiple call logs testing different scenarios. 
+
+### 🎯 Task
+
+Transform your single test into a comprehensive test suite that covers multiple booking scenarios using the `SpecRecLogsAttribute`. Instead of writing multiple similar tests, you'll define the system under test once and create verified files for each scenario.
+
+### 🏆 Concept: SpecRecLogsAttribute
+
+Use `[SpecRecLogs]` to turn verified files into test cases:
 
 ```csharp
 [Theory]
-[InlineData("FLIGHT001", 1, "Standard")]
-[InlineData("FLIGHT002", 2, "Premium")]
-[InlineData("FLIGHT003", 4, "Group")]
-public async Task ProcessBooking_ShouldHandleDifferentScenarios(
-    string flightCode, 
-    int passengerCount, 
-    string expectedCategory)
+[SpecRecLogs]
+public async Task BookFlight_MultipleScenarios(CallLog callLog)
 {
-    // Arrange
-    var storybook = new StringBuilder();
-    var callLogger = new CallLogger(storybook);
-    var factory = ObjectFactory.Instance();
-    
-    try
-    { 
-        // Setup your test doubles using the factory
-        factory.SetOne(callLogger.Wrap<IService1>(new Service1Stub(), "🔧"));
-        factory.SetOne(callLogger.Wrap<IService2>(new Service2Stub(), "⚙️"));
-
-        // Act
-        var result = systemUnderTest.ProcessBooking(flightCode, passengerCount);
-
-        // Assert
-        var logOutput = storybook.ToString();
-        Assert.Contains(expectedCategory, logOutput);
-        Assert.NotNull(result);
-    }
-    finally
-    {
-        factory.ClearAll();
-    }
+    // Same test setup for all scenarios
+    // Each .verified.txt file becomes a separate test case
 }
 ```
 
-#### Advanced Data Providers
+Create files like `BookFlight_MultipleScenarios.StandardBooking.verified.txt` and `BookFlight_MultipleScenarios.NoAvailability.verified.txt`. Each file runs as its own test automatically.
 
-For complex test scenarios, use `[MemberData]` with static methods:
+If you need to inject test values, you can also include those in the call log. 
+
+First, you need to add the parameters to your test:
 
 ```csharp
-public static IEnumerable<object[]> TestScenarios()
-{
-    yield return new object[] 
-    { 
-        "SCENARIO_A", 
-        new DateTime(2025, 06, 15), // Weekend
-        100.00m, // Base amount
-        "PREMIUM" // Expected result
-    };
-    
-    yield return new object[] 
-    { 
-        "SCENARIO_B", 
-        new DateTime(2025, 06, 16), // Weekday
-        50.00m, // Lower amount
-        "STANDARD" // Expected result
-    };
-}
-
 [Theory]
-[MemberData(nameof(TestScenarios))]
-public async Task ProcessRequest_ComprehensiveScenarios(
-    string scenarioId, 
-    DateTime date, 
-    decimal amount, 
-    string expectedResult)
+[SpecRecLogs]
+public async Task BookFlight_MultipleScenarios(CallLog callLog, string name = 'John Doe', int age = 42)
 {
-    // Test implementation using the provided data
-    // Verify behavior varies correctly across scenarios
+
 }
 ```
 
-#### Benefits of Data Providers
+And then specify values at the start of the call log:
 
-- **Comprehensive Coverage**: Test edge cases, boundary conditions, and multiple scenarios
-- **Maintainable**: Add new test cases by adding data, not duplicating code
-- **Clear Documentation**: Test data serves as living documentation of system behavior
-- **Regression Protection**: Easily add test cases when bugs are found
+```
+📋 <Test Inputs>
+  🔸 name: "Jane Smith"
+  🔸 age: 23
+```
 
-#### Best Practices
-
-1. **Start Simple**: Use `[InlineData]` for basic scenarios
-2. **Use `[MemberData]` for Complex Cases**: When you need objects, dates, or computed values
-3. **Name Meaningfully**: Make test data self-documenting
-4. **Group Related Scenarios**: Keep related test cases in the same theory
-5. **Verify Multiple Aspects**: Check outputs, side effects, and logs in comprehensive tests
+If you specified default values, you can omit any of the input values.

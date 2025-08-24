@@ -5,19 +5,22 @@ namespace LegacyBookingCoordinator.Tests
 {
     public class BookingCoordinatorTests
     {
-        [Fact]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully()
+        [Theory]
+        [SpecRecLogs]
+        public async Task BookFlight(
+            CallLog callLog,
+            string specialRequests = "meal,wheelchair",
+            string airlineCode = "AA",
+            int passengerCount = 2,
+            string departureAt = "2025-07-03 12:42:11",
+            string flightNumber = "AA123",
+            string passengerName = "John Doe",
+            string bookingAt = "2025-03-04 14:00:56"
+        )
         {
             // Arrange
-            var passengerName = "John Doe";
-            var flightNumber = "AA123";
-            var departureDate = new DateTime(2025, 07, 03, 12, 42, 11);
-            var passengerCount = 2;
-            var airlineCode = "AA";
-            var specialRequests = "meal,wheelchair";
-            var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
-
-            var callLog = CallLog.FromVerifiedFile();
+            var departureDate = DateTime.Parse(departureAt);
+            var bookingDate = DateTime.Parse(bookingAt);
 
             var factory = ObjectFactory.Instance();
 
@@ -37,6 +40,10 @@ namespace LegacyBookingCoordinator.Tests
 
                 // Assert
                 await callLog.Verify();
+            }
+            catch (Exception e)
+            {
+                callLog.AppendLine(e.ToString());
             }
             finally
             {

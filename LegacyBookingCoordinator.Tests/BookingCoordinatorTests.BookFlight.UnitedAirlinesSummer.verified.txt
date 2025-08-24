@@ -1,0 +1,66 @@
+📋 <Test Inputs>
+  🔸 airlineCode: "UA"
+  🔸 flightNumber: "UA456" 
+  🔸 departureAt: "2025-07-15 14:30:00"
+
+💾 IBookingRepository constructor called with:
+  🔸 dbConnectionString: "Server=production-db;Database=FlightBookings;Trusted_Connection=true;"
+  🔸 maxRetries: 1
+
+✈️ IFlightAvailabilityService constructor called with:
+  🔸 connectionString: "Server=production-db;Database=FlightAvailability_UA;Trusted_Connection=true;"
+
+✈️ CheckAndGetAvailableSeatsForBooking:
+  🔸 flightNumber: "UA456"
+  🔸 departureDate: 2025-07-15 14:30:00
+  🔸 passengerCount: 2
+  🔹 Returns: ["12A","12B"]
+
+📣 IPartnerNotifier constructor called with:
+  🔸 smtpServer: "smtp.united.com"
+  🔸 useEncryption: False
+
+🪵 IAuditLogger constructor called with:
+  🔸 logDirectory: "C:\\Logs\\BookingLogs\\LowVolume"
+  🔸 verboseMode: False
+
+💾 SaveBookingDetails:
+  🔸 passengerName: "John Doe"
+  🔸 flightDetails: "UA456 on 2025-07-15 for 2 passengers"
+  🔸 price: 1181.43274000
+  🔸 bookingDate: 2025-03-04 14:00:56
+  🔹 Returns: "UA4560002JOH"
+
+🪵 LogBookingActivity:
+  🔸 activity: "Flight Booked"
+  🔸 bookingReference: "UA4560002JOH"
+  🔸 userInfo: "Passenger: John Doe, Flight: UA456"
+
+🪵 RecordPricingCalculation:
+  🔸 calculationDetails: "Base: 1131.43274000, Weekday: 1.0, Seasonal: 50.0, Special: 20.0, Discount: 0.0"
+  🔸 finalPrice: 1181.43274000
+  🔸 flightInfo: "UA456 on 2025-07-15"
+
+📣 NotifyPartnerAboutBooking:
+  🔸 airlineCode: "UA"
+  🔸 bookingReference: "UA4560002JOH"
+  🔸 totalPrice: 1181.43274000
+  🔸 passengerName: "John Doe"
+  🔸 flightDetails: "UA456 departing 2025-07-15 14:30"
+  🔸 isRebooking: False
+
+📣 UpdatePartnerBookingStatus:
+  🔸 airlineCode: "UA"
+  🔸 bookingRef: "UA4560002JOH"
+  🔸 newStatus: "CONFIRMED_PREMIUM"
+
+New booking: UA4560002JOH
+  👤 John Doe
+  ✈️ UA456
+  📅 2025-07-15 14:30
+  👥 2
+  🏢 UA
+  💰 $1181,43
+  🎯 meal,wheelchair
+  📝 2025-03-04 14:00
+  ✅ CONFIRMED_PREMIUM

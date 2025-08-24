@@ -1,0 +1,73 @@
+📋 <Test Inputs>
+  🔸 departureAt: "2025-07-08 09:30:00"
+  🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
+  🔸 maxRetries: 1
+  🔸 connectionString: Server=production-db;Database=FlightAvailability_AA;Trusted_Connection=true;
+
+💾 IBookingRepository constructor called with:
+  🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
+  🔸 maxRetries: 1
+
+✈️ IFlightAvailabilityService constructor called with:
+  🔸 connectionString: Server=production-db;Database=FlightAvailability_AA;Trusted_Connection=true;
+
+✈️ CheckAndGetAvailableSeatsForBooking:
+  🔸 flightNumber: "AA123"
+  🔸 departureDate: 07/08/2025 09:30:00
+  🔸 passengerCount: 2
+  🔹 Returns: ["14A","14B"]
+
+📣 IPartnerNotifier constructor called with:
+  🔸 smtpServer: smtp.american.com
+  🔸 useEncryption: True
+
+🪵 IAuditLogger constructor called with:
+  🔸 logDirectory: C:\Logs\BookingLogs\LowVolume
+  🔸 verboseMode: False
+
+💾 SaveBookingDetails:
+  🔸 passengerName: "John Doe"
+  🔸 flightDetails: "AA123 on 2025-07-08 for 2 passengers"
+  🔸 price: 1051.22973300
+  🔸 bookingDate: 03/04/2025 14:00:56
+  🔹 Returns: "AA1230002JOH"
+
+🪵 LogBookingActivity:
+  🔸 activity: "Flight Booked"
+  🔸 bookingReference: "AA1230002JOH"
+  🔸 userInfo: "Passenger: John Doe, Flight: AA123"
+
+🪵 RecordPricingCalculation:
+  🔸 calculationDetails: "Base: 1101.3663700, Weekday: 0.9, Seasonal: 50.0, Special: 20.0, Discount: 10.0"
+  🔸 finalPrice: 1051.22973300
+  🔸 flightInfo: "AA123 on 2025-07-08"
+
+📣 NotifyPartnerAboutBooking:
+  🔸 airlineCode: "AA"
+  🔸 bookingReference: "AA1230002JOH"
+  🔸 totalPrice: 1051.22973300
+  🔸 passengerName: "John Doe"
+  🔸 flightDetails: "AA123 departing 2025-07-08 09:30"
+  🔸 isRebooking: False
+
+📣 ValidateAndNotifySpecialRequests:
+  🔸 airlineCode: "AA"
+  🔸 specialRequests: "meal,wheelchair"
+  🔸 bookingRef: "AA1230002JOH"
+  🔹 Returns: True
+
+📣 UpdatePartnerBookingStatus:
+  🔸 airlineCode: "AA"
+  🔸 bookingRef: "AA1230002JOH"
+  🔸 newStatus: "CONFIRMED_PREMIUM"
+
+New booking: AA1230002JOH
+  👤 John Doe
+  ✈️ AA123
+  📅 2025-07-08 09:30
+  👥 2
+  🏢 AA
+  💰 $1051,23
+  🎯 meal,wheelchair
+  📝 2025-03-04 14:00
+  ✅ CONFIRMED_PREMIUM

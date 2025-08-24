@@ -1,0 +1,72 @@
+📋 <Test Inputs>
+  🔸 airlineCode: "BA"
+  🔸 flightNumber: "BA789"
+  🔸 departureAt: "2025-12-20 10:15:00"
+
+💾 IBookingRepository constructor called with:
+  🔸 dbConnectionString: "Server=production-db;Database=FlightBookings;Trusted_Connection=true;"
+  🔸 maxRetries: 1
+
+✈️ IFlightAvailabilityService constructor called with:
+  🔸 connectionString: "Server=production-db;Database=FlightAvailability_BA;Trusted_Connection=true;"
+
+✈️ CheckAndGetAvailableSeatsForBooking:
+  🔸 flightNumber: "BA789"
+  🔸 departureDate: 2025-12-20 10:15:00
+  🔸 passengerCount: 2
+  🔹 Returns: ["15A","15B"]
+
+📣 IPartnerNotifier constructor called with:
+  🔸 smtpServer: "smtp.britishairways.com"
+  🔸 useEncryption: False
+
+🪵 IAuditLogger constructor called with:
+  🔸 logDirectory: "C:\\Logs\\BookingLogs\\LowVolume"
+  🔸 verboseMode: False
+
+💾 SaveBookingDetails:
+  🔸 passengerName: "John Doe"
+  🔸 flightDetails: "BA789 on 2025-12-20 for 2 passengers"
+  🔸 price: 1216.43274000
+  🔸 bookingDate: 2025-03-04 14:00:56
+  🔹 Returns: "BA7890002JOH"
+
+🪵 LogBookingActivity:
+  🔸 activity: "Flight Booked"
+  🔸 bookingReference: "BA7890002JOH"
+  🔸 userInfo: "Passenger: John Doe, Flight: BA789"
+
+🪵 RecordPricingCalculation:
+  🔸 calculationDetails: "Base: 1131.43274000, Weekday: 1.0, Seasonal: 75.0, Special: 15.0, Discount: 0.0"
+  🔸 finalPrice: 1216.43274000
+  🔸 flightInfo: "BA789 on 2025-12-20"
+
+📣 NotifyPartnerAboutBooking:
+  🔸 airlineCode: "BA"
+  🔸 bookingReference: "BA7890002JOH"
+  🔸 totalPrice: 1216.43274000
+  🔸 passengerName: "John Doe"
+  🔸 flightDetails: "BA789 departing 2025-12-20 10:15"
+  🔸 isRebooking: False
+
+📣 ValidateAndNotifySpecialRequests:
+  🔸 airlineCode: "BA"
+  🔸 specialRequests: "meal,wheelchair"
+  🔸 bookingRef: "BA7890002JOH"
+  🔹 Returns: True
+
+📣 UpdatePartnerBookingStatus:
+  🔸 airlineCode: "BA"
+  🔸 bookingRef: "BA7890002JOH"
+  🔸 newStatus: "CONFIRMED_PREMIUM"
+
+New booking: BA7890002JOH
+  👤 John Doe
+  ✈️ BA789
+  📅 2025-12-20 10:15
+  👥 2
+  🏢 BA
+  💰 $1216,43
+  🎯 meal,wheelchair
+  📝 2025-03-04 14:00
+  ✅ CONFIRMED_PREMIUM

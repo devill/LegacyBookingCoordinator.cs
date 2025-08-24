@@ -142,6 +142,32 @@ Your current test probably looks something like this:
 
 ### 🦜 Concept: Parrot
 
+For the parrot to you will need a CallLog instead of the string writer:
+```csharp
+var callLog = CallLog.FromVerifiedFile();
+```
+
+Now instead of implementing stubs, you can let Parrot repla values from verified files:
+
+```csharp
+factory.SetOne(Parrot.Create<IBookingRepository>(callLog, "💾"));
+```
+
+You can add your own lines just as with the string writer:
+
+```csharp
+callLog.AppendLine(booking.ToString());
+```
+
+But you need to verify the result slightly differently: 
+
+```csharp
+await callLog.Verify();
+```
+
+Normally the first run throws a `ParrotMissingReturnValueException`. Fill in return values in the `.received.txt` file, rename to `.verified.txt`. Repeat until green.
+
+However, since you already have a verified call log with return values, the test should pass right away. 
 
 
 ## 💎 Comprehensive scenario testing
@@ -154,3 +180,39 @@ Transform your single test into a comprehensive test suite that covers multiple 
 
 ### 🏆 Concept: SpecRecLogsAttribute
 
+Use `[SpecRecLogs]` to turn verified files into test cases:
+
+```csharp
+[Theory]
+[SpecRecLogs]
+public async Task BookFlight_MultipleScenarios(CallLog callLog)
+{
+    // Same test setup for all scenarios
+    // Each .verified.txt file becomes a separate test case
+}
+```
+
+Create files like `BookFlight_MultipleScenarios.StandardBooking.verified.txt` and `BookFlight_MultipleScenarios.NoAvailability.verified.txt`. Each file runs as its own test automatically.
+
+If you need to inject test values, you can also include those in the call log. 
+
+First, you need to add the parameters to your test:
+
+```csharp
+[Theory]
+[SpecRecLogs]
+public async Task BookFlight_MultipleScenarios(CallLog callLog, string name = 'John Doe', int age = 42)
+{
+
+}
+```
+
+And then specify values at the start of the call log:
+
+```
+📋 <Test Inputs>
+  🔸 name: "Jane Smith"
+  🔸 age: 23
+```
+
+If you specified default values, you can omit any of the input values.

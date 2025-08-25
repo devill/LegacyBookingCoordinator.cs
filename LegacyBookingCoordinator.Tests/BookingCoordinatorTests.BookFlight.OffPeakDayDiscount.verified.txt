@@ -1,8 +1,5 @@
 📋 <Test Inputs>
   🔸 departureAt: "2025-07-08 09:30:00"
-  🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
-  🔸 maxRetries: 1
-  🔸 connectionString: Server=production-db;Database=FlightAvailability_AA;Trusted_Connection=true;
 
 💾 IBookingRepository constructor called with:
   🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;

@@ -37,16 +37,14 @@ namespace LegacyBookingCoordinator.Tests
                     passengerCount, airlineCode, specialRequests);
 
                 callLog.AppendLine(booking.ToString());
-
-                // Assert
-                await callLog.Verify();
             }
             catch (Exception e)
             {
-                callLog.AppendLine(e.ToString());
+                callLog.AppendLine(e.Message);
             }
             finally
             {
+                await callLog.Verify();
                 factory.ClearAll();
             }
         }

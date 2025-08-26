@@ -38,6 +38,10 @@ namespace LegacyBookingCoordinator.Tests
 
                 callLog.AppendLine(booking.ToString());
             }
+            catch (ParrotException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 callLog.AppendLine(e.Message);

@@ -28,4 +28,16 @@
     <ProjectReference Include="..\LegacyBookingCoordinator\LegacyBookingCoordinator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="BookingCoordinatorTests.BookFlight.BritishAirwaysWinter.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.GroupBooking.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.InsufficientSeats.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.InternationalAirlineOffPeak.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.NoSpecialRequests.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.OffPeakDayDiscount.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.PeakDayPricing.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.ShouldCreateBookingSuccessfully.verified.txt" />
+    <None Remove="BookingCoordinatorTests.BookFlight.UnitedAirlinesSummer.verified.txt" />
+  </ItemGroup>
+
 </Project>

@@ -1,3 +1,4 @@
+using System.CodeDom;
 using System.Text;
 using SpecRec;
 
@@ -5,8 +6,9 @@ namespace LegacyBookingCoordinator.Tests
 {
     public class BookingCoordinatorTests
     {
-        [Fact]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully()
+        [Theory]
+        [SpecRecLogs]
+        public async Task BookFlight_ShouldCreateBookingSuccessfully(Context context)
         {
             // Arrange
             var passengerName = "John Doe";
@@ -17,31 +19,17 @@ namespace LegacyBookingCoordinator.Tests
             var specialRequests = "meal,wheelchair";
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
 
-            var storybook = new StringBuilder();
-
-            var factory = ObjectFactory.Instance();
-
-            try
-            {
-                factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
-                factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
-                factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
-                factory.SetOne<IAuditLogger>(new AuditLoggerStub());
-                factory.SetOne<Random>(new RandomStub());
-
+            await context.Verify(async () => {
+                context.SetOne<IBookingRepository>(new BookingRepositoryStub());
+                context.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
+                context.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
+                context.SetOne<IAuditLogger>(new AuditLoggerStub());
+                context.SetOne<Random>(new RandomStub());
+                
                 var coordinator = new BookingCoordinator(bookingDate);
-                var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests);
-
-                storybook.AppendLine(booking.ToString());
-
-                // Assert
-                await Verify(storybook.ToString());
-            }
-            finally
-            {
-                factory.ClearAll();
-            }
+                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests).ToString();
+            });
         }
     }
 

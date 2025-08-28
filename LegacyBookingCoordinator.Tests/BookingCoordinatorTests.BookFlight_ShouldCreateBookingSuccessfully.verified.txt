@@ -24,11 +24,11 @@
   🔸 flightDetails: "AA123 on 2025-07-03 for 2 passengers"
   🔸 price: 1161.36637000
   🔸 bookingDate: 04-03-2025 14:00:56
-  🔹 Returns: "DRW6N"
+  🔹 Returns: "APPLE3.14"
 
 🪵 LogBookingActivity:
   🔸 activity: "Flight Booked"
-  🔸 bookingReference: "DRW6N"
+  🔸 bookingReference: "APPLE3.14"
   🔸 userInfo: "Passenger: John Doe, Flight: AA123"
 
 🪵 RecordPricingCalculation:
@@ -38,7 +38,7 @@
 
 📣 NotifyPartnerAboutBooking:
   🔸 airlineCode: "AA"
-  🔸 bookingReference: "DRW6N"
+  🔸 bookingReference: "APPLE3.14"
   🔸 totalPrice: 1161.36637000
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "AA123 departing 2025-07-03 12:42"
@@ -47,15 +47,15 @@
 📣 ValidateAndNotifySpecialRequests:
   🔸 airlineCode: "AA"
   🔸 specialRequests: "meal,wheelchair"
-  🔸 bookingRef: "DRW6N"
+  🔸 bookingRef: "APPLE3.14"
   🔹 Returns: True
 
 📣 UpdatePartnerBookingStatus:
   🔸 airlineCode: "AA"
-  🔸 bookingRef: "DRW6N"
+  🔸 bookingRef: "APPLE3.14"
   🔸 newStatus: "CONFIRMED_PREMIUM"
 
-New booking: "DRW6N
+Returns: "New booking: APPLE3.14
   👤 John Doe
   ✈️ AA123
   📅 2025-07-03 12:42

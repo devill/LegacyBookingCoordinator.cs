@@ -21,9 +21,9 @@ namespace LegacyBookingCoordinator.Tests
 
             await context.Verify(async () => {
                 context.SetOne(context.Wrap<IBookingRepository>(new BookingRepositoryStub(), "💾"));
+                context.SetOne(context.Wrap<IFlightAvailabilityService>(new FlightAvailabilityServiceStub(), "✈️"));
                 context.SetOne(context.Wrap<IPartnerNotifier>(new PartnerNotifierStub(), "📣"));
                 context.SetOne(context.Wrap<IAuditLogger>(new AuditLoggerStub(), "🪵"));
-                context.SetOne(context.Wrap<IFlightAvailabilityService>(new FlightAvailabilityServiceStub(), "✈️"));
                 context.SetOne<Random>(new RandomStub());
                 
                 var coordinator = new BookingCoordinator(bookingDate);

@@ -1,3 +1,4 @@
+using System.CodeDom;
 using System.Text;
 using SpecRec;
 
@@ -5,8 +6,9 @@ namespace LegacyBookingCoordinator.Tests
 {
     public class BookingCoordinatorTests
     {
-        [Fact]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully()
+        [Theory]
+        [SpecRecLogs]
+        public async Task BookFlight_ShouldCreateBookingSuccessfully(Context context)
         {
             // Arrange
             var passengerName = "John Doe";
@@ -16,36 +18,22 @@ namespace LegacyBookingCoordinator.Tests
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
-            
-            var cl = new CallLogger();
 
-            var factory = ObjectFactory.Instance();
-
-            try
-            {
-                factory.SetOne(cl.Wrap<IBookingRepository>(new BookingRepositoryStub(), "💾"));
-                factory.SetOne(cl.Wrap<IPartnerNotifier>(new PartnerNotifierStub(), "📣"));
-                factory.SetOne(cl.Wrap<IAuditLogger>(new AuditLoggerStub(), "🪵"));
-                factory.SetOne(cl.Wrap<IFlightAvailabilityService>(new FlightAvailabilityServiceStub(), "✈️"));
-                factory.SetOne<Random>(new RandomStub());
-
+            await context.Verify(async () => {
+                context.SetOne(context.Wrap<IBookingRepository>(new BookingRepositoryStub(), "💾"));
+                context.SetOne(context.Wrap<IPartnerNotifier>(new PartnerNotifierStub(), "📣"));
+                context.SetOne(context.Wrap<IAuditLogger>(new AuditLoggerStub(), "🪵"));
+                context.SetOne(context.Wrap<IFlightAvailabilityService>(new FlightAvailabilityServiceStub(), "✈️"));
+                context.SetOne<Random>(new RandomStub());
+                
                 var coordinator = new BookingCoordinator(bookingDate);
-                var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests);
-
-                cl.SpecBook.AppendLine(booking.ToString());
-
-                // Assert
-                await Verify(cl.SpecBook.ToString());
-            }
-            finally
-            {
-                factory.ClearAll();
-            }
+                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests).ToString();
+            });
         }
     }
 
-    public class AuditLoggerStub : IAuditLogger, IConstructorCalledWith
+    public class AuditLoggerStub : IAuditLogger
     {
         public void LogBookingActivity(string activity, string bookingReference, string userInfo)
         {
@@ -64,14 +52,9 @@ namespace LegacyBookingCoordinator.Tests
         {
             throw new NotImplementedException();
         }
-
-        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
-        {
-            
-        }
     }
 
-    public class PartnerNotifierStub : IPartnerNotifier, IConstructorCalledWith
+    public class PartnerNotifierStub : IPartnerNotifier
     {
         public void NotifyPartnerAboutBooking(string airlineCode, string bookingReference, decimal totalPrice,
             string passengerName,
@@ -87,14 +70,9 @@ namespace LegacyBookingCoordinator.Tests
         public void UpdatePartnerBookingStatus(string airlineCode, string bookingRef, string newStatus)
         {
         }
-
-        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
-        {
-            
-        }
     }
 
-    public class FlightAvailabilityServiceStub : IFlightAvailabilityService, IConstructorCalledWith
+    public class FlightAvailabilityServiceStub : IFlightAvailabilityService
     {
         public List<string> CheckAndGetAvailableSeatsForBooking(string flightNumber, DateTime departureDate,
             int passengerCount)
@@ -106,19 +84,14 @@ namespace LegacyBookingCoordinator.Tests
         {
             throw new NotImplementedException();
         }
-
-        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
-        {
-            
-        }
     }
 
-    public class BookingRepositoryStub : IBookingRepository, IConstructorCalledWith
+    public class BookingRepositoryStub : IBookingRepository
     {
         public string SaveBookingDetails(string passengerName, string flightDetails, decimal price,
             DateTime bookingDate)
         {
-            return "DRW6N";
+            return "APPLE3.14";
         }
 
         public Dictionary<string, object> GetBookingInfo(string bookingReference)
@@ -135,11 +108,6 @@ namespace LegacyBookingCoordinator.Tests
         public decimal GetHistoricalPricingData(string flightNumber, DateTime date, int dayRange)
         {
             throw new NotImplementedException();
-        }
-
-        public void ConstructorCalledWith(ConstructorParameterInfo[] parameters)
-        {
-            
         }
     }
 

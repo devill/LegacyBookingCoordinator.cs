@@ -10,7 +10,7 @@
 
 ✈️ CheckAndGetAvailableSeatsForBooking:
   🔸 flightNumber: "AA123"
-  🔸 departureDate: 07/04/2025 16:00:00
+  🔸 departureDate: 04-07-2025 16:00:00
   🔸 passengerCount: 2
   🔹 Returns: ["13A","13B"]
 
@@ -26,7 +26,7 @@
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "AA123 on 2025-07-04 for 2 passengers"
   🔸 price: 1436.707962500
-  🔸 bookingDate: 03/04/2025 14:00:56
+  🔸 bookingDate: 04-03-2025 14:00:56
   🔹 Returns: "AA1230002JOH"
 
 🪵 LogBookingActivity:
@@ -58,7 +58,7 @@
   🔸 bookingRef: "AA1230002JOH"
   🔸 newStatus: "CONFIRMED_PREMIUM"
 
-New booking: AA1230002JOH
+Returns: "New booking: AA1230002JOH
   👤 John Doe
   ✈️ AA123
   📅 2025-07-04 16:00
@@ -67,4 +67,4 @@ New booking: AA1230002JOH
   💰 $1436,71
   🎯 meal,wheelchair
   📝 2025-03-04 14:00
-  ✅ CONFIRMED_PREMIUM
+  ✅ CONFIRMED_PREMIUM"

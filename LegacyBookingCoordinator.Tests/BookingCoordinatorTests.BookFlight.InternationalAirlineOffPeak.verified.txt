@@ -12,7 +12,7 @@
 
 ✈️ CheckAndGetAvailableSeatsForBooking:
   🔸 flightNumber: "LH234"
-  🔸 departureDate: 04/15/2025 11:00:00
+  🔸 departureDate: 15-04-2025 11:00:00
   🔸 passengerCount: 2
   🔹 Returns: ["20A","20B"]
 
@@ -28,7 +28,7 @@
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "LH234 on 2025-04-15 for 2 passengers"
   🔸 price: 1118.72973300
-  🔸 bookingDate: 03/04/2025 14:00:56
+  🔸 bookingDate: 04-03-2025 14:00:56
   🔹 Returns: "LH2340002JOH"
 
 🪵 LogBookingActivity:
@@ -46,7 +46,7 @@
   🔸 bookingRef: "LH2340002JOH"
   🔸 newStatus: "CONFIRMED_PREMIUM"
 
-New booking: LH2340002JOH
+Returns: "New booking: LH2340002JOH
   👤 John Doe
   ✈️ LH234
   📅 2025-04-15 11:00
@@ -55,4 +55,4 @@ New booking: LH2340002JOH
   💰 $1118,73
   🎯 meal,wheelchair
   📝 2025-03-04 14:00
-  ✅ CONFIRMED_PREMIUM
+  ✅ CONFIRMED_PREMIUM"

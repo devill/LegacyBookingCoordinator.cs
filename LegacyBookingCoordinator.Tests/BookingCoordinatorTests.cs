@@ -8,7 +8,7 @@ namespace LegacyBookingCoordinator.Tests
     {
         [Theory]
         [SpecRecLogs]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully(
+        public async Task BookFlight(
             Context context,
             string passengerName = "John Doe",
             string flightNumber = "AA123",
@@ -19,6 +19,9 @@ namespace LegacyBookingCoordinator.Tests
             string bookingAt = "2025-03-04 14:00:56"
             )
         {
+            var departureDate = DateTime.Parse(departureAt);
+            var bookingDate = DateTime.Parse(bookingAt);
+            
             await context.Verify(async () => {
                 context.SetOne(context.Parrot<IBookingRepository>("💾"));
                 context.SetOne(context.Parrot<IFlightAvailabilityService>("✈️"));

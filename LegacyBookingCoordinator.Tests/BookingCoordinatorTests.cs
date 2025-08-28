@@ -12,15 +12,16 @@ namespace LegacyBookingCoordinator.Tests
             Context context,
             string passengerName = "John Doe",
             string flightNumber = "AA123",
-            string departureAt = "2025-07-03 12:42:11",
+            DateTime? departureDate = null,
             int passengerCount = 2,
             string airlineCode = "AA",
             string specialRequests = "meal,wheelchair",
-            string bookingAt = "2025-03-04 14:00:56"
+            DateTime? bookingDate = null
             )
         {
-            var departureDate = DateTime.Parse(departureAt);
-            var bookingDate = DateTime.Parse(bookingAt);
+            // Use default values if DateTime parameters are not set
+            var actualDepartureDate = departureDate ?? new DateTime(2025, 07, 03, 12, 42, 11);
+            var actualBookingDate = bookingDate ?? new DateTime(2025, 03, 04, 14, 00, 56);
             
             await context.Verify(async () => {
                 context
@@ -31,8 +32,8 @@ namespace LegacyBookingCoordinator.Tests
                 
                 context.SetOne<Random>(new RandomStub());
                 
-                var coordinator = new BookingCoordinator(bookingDate);
-                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
+                var coordinator = new BookingCoordinator(actualBookingDate);
+                return coordinator.BookFlight(passengerName, flightNumber, actualDepartureDate,
                     passengerCount, airlineCode, specialRequests).ToString();
             });
         }

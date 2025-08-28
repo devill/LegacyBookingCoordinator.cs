@@ -1,5 +1,5 @@
 📋 <Test Inputs>
-  🔸 departureAt: "2025-07-04 16:00:00"
+  🔸 departureDate: 2025-07-04 16:00:00
 
 💾 IBookingRepository constructor called with:
   🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
@@ -10,7 +10,7 @@
 
 ✈️ CheckAndGetAvailableSeatsForBooking:
   🔸 flightNumber: "AA123"
-  🔸 departureDate: 04-07-2025 16:00:00
+  🔸 departureDate: 2025-07-04 16:00:00
   🔸 passengerCount: 2
   🔹 Returns: ["13A","13B"]
 
@@ -26,7 +26,7 @@
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "AA123 on 2025-07-04 for 2 passengers"
   🔸 price: 1436.707962500
-  🔸 bookingDate: 04-03-2025 14:00:56
+  🔸 bookingDate: 2025-03-04 14:00:56
   🔹 Returns: "AA1230002JOH"
 
 🪵 LogBookingActivity:

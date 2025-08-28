@@ -1,7 +1,7 @@
 📋 <Test Inputs>
   🔸 airlineCode: "LH"
   🔸 flightNumber: "LH234"
-  🔸 departureAt: "2025-04-15 11:00:00"
+  🔸 departureDate: 2025-04-15 11:00:00
 
 💾 IBookingRepository constructor called with:
   🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
@@ -12,7 +12,7 @@
 
 ✈️ CheckAndGetAvailableSeatsForBooking:
   🔸 flightNumber: "LH234"
-  🔸 departureDate: 15-04-2025 11:00:00
+  🔸 departureDate: 2025-04-15 11:00:00
   🔸 passengerCount: 2
   🔹 Returns: ["20A","20B"]
 
@@ -28,7 +28,7 @@
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "LH234 on 2025-04-15 for 2 passengers"
   🔸 price: 1118.72973300
-  🔸 bookingDate: 04-03-2025 14:00:56
+  🔸 bookingDate: 2025-03-04 14:00:56
   🔹 Returns: "LH2340002JOH"
 
 🪵 LogBookingActivity:

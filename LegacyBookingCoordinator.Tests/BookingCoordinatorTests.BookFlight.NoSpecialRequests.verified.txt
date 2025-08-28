@@ -10,7 +10,7 @@
 
 ✈️ CheckAndGetAvailableSeatsForBooking:
   🔸 flightNumber: "AA123"
-  🔸 departureDate: 03-07-2025 12:42:11
+  🔸 departureDate: 2025-07-03 12:42:11
   🔸 passengerCount: 2
   🔹 Returns: ["16A","16B"]
 
@@ -26,7 +26,7 @@
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "AA123 on 2025-07-03 for 2 passengers"
   🔸 price: 1141.36637000
-  🔸 bookingDate: 04-03-2025 14:00:56
+  🔸 bookingDate: 2025-03-04 14:00:56
   🔹 Returns: "AA1230002JOH"
 
 🪵 LogBookingActivity:

@@ -1,7 +1,7 @@
 📋 <Test Inputs>
   🔸 airlineCode: "BA"
   🔸 flightNumber: "BA789"
-  🔸 departureAt: "2025-12-20 10:15:00"
+  🔸 departureDate: 2025-12-20 10:15:00
 
 💾 IBookingRepository constructor called with:
   🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
@@ -12,7 +12,7 @@
 
 ✈️ CheckAndGetAvailableSeatsForBooking:
   🔸 flightNumber: "BA789"
-  🔸 departureDate: 20-12-2025 10:15:00
+  🔸 departureDate: 2025-12-20 10:15:00
   🔸 passengerCount: 2
   🔹 Returns: ["15A","15B"]
 
@@ -28,7 +28,7 @@
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "BA789 on 2025-12-20 for 2 passengers"
   🔸 price: 1206.36637000
-  🔸 bookingDate: 04-03-2025 14:00:56
+  🔸 bookingDate: 2025-03-04 14:00:56
   🔹 Returns: "BA7890002JOH"
 
 🪵 LogBookingActivity:

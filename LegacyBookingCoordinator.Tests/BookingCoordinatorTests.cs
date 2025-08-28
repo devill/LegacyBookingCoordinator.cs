@@ -1,3 +1,4 @@
+using System.CodeDom;
 using System.Text;
 using SpecRec;
 
@@ -7,53 +8,31 @@ namespace LegacyBookingCoordinator.Tests
     {
         [Theory]
         [SpecRecLogs]
-        public async Task BookFlight(
-            CallLog callLog,
-            string specialRequests = "meal,wheelchair",
-            string airlineCode = "AA",
-            int passengerCount = 2,
-            string departureAt = "2025-07-03 12:42:11",
-            string flightNumber = "AA123",
+        public async Task BookFlight_ShouldCreateBookingSuccessfully(
+            Context context,
             string passengerName = "John Doe",
+            string flightNumber = "AA123",
+            string departureAt = "2025-07-03 12:42:11",
+            int passengerCount = 2,
+            string airlineCode = "AA",
+            string specialRequests = "meal,wheelchair",
             string bookingAt = "2025-03-04 14:00:56"
-        )
+            )
         {
-            // Arrange
-            var departureDate = DateTime.Parse(departureAt);
-            var bookingDate = DateTime.Parse(bookingAt);
-
-            var factory = ObjectFactory.Instance();
-
-            try
-            {
-                factory.SetOne(Parrot.Create<IBookingRepository>(callLog, "💾"));
-                factory.SetOne(Parrot.Create<IPartnerNotifier>(callLog, "📣"));
-                factory.SetOne(Parrot.Create<IAuditLogger>(callLog, "🪵"));
-                factory.SetOne(Parrot.Create<IFlightAvailabilityService>(callLog, "✈️"));
-                factory.SetOne<Random>(new RandomStub());
-
+            await context.Verify(async () => {
+                context.SetOne(context.Parrot<IBookingRepository>("💾"));
+                context.SetOne(context.Parrot<IFlightAvailabilityService>("✈️"));
+                context.SetOne(context.Parrot<IPartnerNotifier>("📣"));
+                context.SetOne(context.Parrot<IAuditLogger>("🪵"));
+                context.SetOne<Random>(new RandomStub());
+                
                 var coordinator = new BookingCoordinator(bookingDate);
-                var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests);
-
-                callLog.AppendLine(booking.ToString());
-            }
-            catch (ParrotException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                callLog.AppendLine(e.Message);
-            }
-            finally
-            {
-                await callLog.Verify();
-                factory.ClearAll();
-            }
+                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests).ToString();
+            });
         }
     }
-    
+
     public class RandomStub : Random
     {
         public override int Next(int minValue, int maxValue)

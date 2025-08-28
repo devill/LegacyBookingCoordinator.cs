@@ -16,9 +16,8 @@ namespace LegacyBookingCoordinator.Tests
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
-
-            var storybook = new StringBuilder();
-            var cl = new CallLogger(storybook);
+            
+            var cl = new CallLogger();
 
             var factory = ObjectFactory.Instance();
 
@@ -34,10 +33,10 @@ namespace LegacyBookingCoordinator.Tests
                 var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests);
 
-                storybook.AppendLine(booking.ToString());
+                cl.SpecBook.AppendLine(booking.ToString());
 
                 // Assert
-                await Verify(storybook.ToString());
+                await Verify(cl.SpecBook.ToString());
             }
             finally
             {

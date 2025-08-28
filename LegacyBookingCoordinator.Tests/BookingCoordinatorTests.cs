@@ -1,12 +1,14 @@
 using System.Text;
 using LegacyBookingCoordinator;
+using SpecRec;
 
 namespace LegacyBookingCoordinator.Tests
 {
     public class BookingCoordinatorTests
     {
-        [Fact]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully()
+        [Theory]
+        [SpecRecLogs]
+        public async Task BookFlight_ShouldCreateBookingSuccessfully(Context context)
         {
             // Arrange
             var passengerName = "John Doe";
@@ -16,14 +18,11 @@ namespace LegacyBookingCoordinator.Tests
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
 
-            var storybook = new StringBuilder();
-
-            var coordinator = new BookingCoordinator();
-            var booking = coordinator.BookFlight(passengerName, flightNumber, departureDate,
-                passengerCount, airlineCode, specialRequests);
-
-            // Assert
-            await Verify(storybook.ToString());
+            await context.Verify(async () => {
+                var coordinator = new BookingCoordinator();
+                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests).ToString();
+            });
         }
     }
 }

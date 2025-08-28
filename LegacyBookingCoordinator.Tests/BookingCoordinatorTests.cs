@@ -23,10 +23,12 @@ namespace LegacyBookingCoordinator.Tests
             var bookingDate = DateTime.Parse(bookingAt);
             
             await context.Verify(async () => {
-                context.SetOne(context.Parrot<IBookingRepository>("💾"));
-                context.SetOne(context.Parrot<IFlightAvailabilityService>("✈️"));
-                context.SetOne(context.Parrot<IPartnerNotifier>("📣"));
-                context.SetOne(context.Parrot<IAuditLogger>("🪵"));
+                context
+                    .Substitute<IBookingRepository>("💾")
+                    .Substitute<IFlightAvailabilityService>("✈️")
+                    .Substitute<IPartnerNotifier>("📣")
+                    .Substitute<IAuditLogger>("🪵");
+                
                 context.SetOne<Random>(new RandomStub());
                 
                 var coordinator = new BookingCoordinator(bookingDate);

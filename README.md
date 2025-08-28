@@ -35,12 +35,12 @@ Did you ever run into a codebase so awkward and full of hard to override depende
 
 ### 🔧 Task
 
-Use the `ObjectFactory` to write a test for `BookingCoordinator.BookFlight()` that:
+Use SpecRec's `Context` to write a test for `BookingCoordinator.BookFlight()` that:
 * Uses stubs instead of the untestable classes
 * Checks that it returns the booking reference produced by the `BookingRepository`
 * All *without extensive changes to the production code*.
 
-This is **impossible** without changing the code. With `ObjectFactory`, you can refactor the `new` calls to use `factory.Create<T>()` and inject test doubles that record behavior.
+This is **impossible** without changing the code. With SpecRec's `Context`, you can refactor the `new` calls to use `factory.Create<T>()` and inject test doubles that record behavior.
 
 ### 🏭 Concept: ObjectFactory
 
@@ -71,6 +71,27 @@ factory.SetAlways<IAuditLogger>(new FakeAuditLogger());
 factory.SetOne<PricingEngine>(new FakePricingEngine());    
 ```
 
+#### Context.Verify
+
+When using SpecRec we use the `[Theory]` annotation with the `[SpecRecLogs]` data provider. (Why that is will become clear later.) The data provider will always include a `Context` as the first parameter. It acts as a wrapper for the most frequently used SpecRec features and provides the `Context.Verfy` wrapper method that will record interactions and verify them against previously approved results. 
+
+Here is how you can call `factory.SetOne<>()` using the context:
+
+```csharp
+[Theory]
+[SpecRecLogs]
+public async Task BookFlight_ShouldCreateBookingSuccessfully(Context context)
+{
+    await context.Verify(async () => {
+        context.SetOne<IBookingRepository>(new BookingRepositoryStub()); ());
+        // ... setup other dependencies
+        
+        var coordinator = new BookingCoordinator(bookingDate);
+        return coordinator.BookFlight(/* parameters */).ToString();
+    });
+}
+```
+
 #### Constructor arguments
 
 If you want to test constructor arguments make sure your test double implements `IConstructorCalledWith`. If it does the `ConstructorCalledWith` method will get called with the constructor parameters upon object creation.
@@ -97,9 +118,7 @@ Create<YourClass>(constructor, arguments);
 
 This kata requires the **SpecRec** NuGet package (version 0.0.3 or later) which provides the enhanced ObjectFactory and related testing utilities.
 
-⚠️ **Important**: All tests that rely on the singleton instance of `ObjectFactory` should call `ObjectFactory.Instance().ClearAll()` to make sure tests remain independent.
-
-⚠️ **Word of caution**: While the singleton instance can be convenient, it can also cause trouble when overused. Only use it temporarily when the alternative is passing in the factory through several layers of indirection. 
+⚠️ **Important**: The `Context` automatically handles test isolation and cleanup, so no manual ObjectFactory clearing is required. 
 
 ## 🥈 Test the interactions
 
@@ -113,21 +132,19 @@ Improve the test for `BookingCoordinator.BookFlight()` so that:
 * It checks price calculation is correct.
 * Verifies logging occurred.
 
-Use the `CallLogger` to create a storybook of calls and check the result using `Verify`. 
+Use the `Context` to wrap test doubles and create a storybook of calls. 
 
-### ☎️ Concept: CallLogger
+### ☎️ Concept: CallLogger / Context.Wrap
 
-The CallLogger uses automatic wrapping to log all method calls:
+The Context can wrap test doubles to automatically log all method calls:
 
 ```csharp
-var storybook = new StringBuilder();
-var callLogger = new CallLogger(storybook);
-
-// Wrap any object to automatically log its method calls
-var service = callLogger.Wrap<IEmailService>(new EmailServiceStub(), "📧");
-
-// All method calls will be automatically logged
-service.SendEmail("user@example.com", "Welcome!");
+await context.Verify(async () => {
+    context.SetOne(context.Wrap<IEmailService>(new EmailServiceStub(), "📧"));
+    
+    // All method calls will be automatically logged
+    service.SendEmail("user@example.com", "Welcome!");
+});
 ```
 
 ## 🏅 Eliminate stub implementations
@@ -136,39 +153,44 @@ Writing stub implementations for every dependency gets tedious fast. But did you
 
 ### 🎯 Task
 
-Replace your `CallLogger` wrapped stubs with `Parrot` test doubles that automatically replay method interactions from verified files. This eliminates the need to write and maintain stub implementations entirely.
+Replace your wrapped stubs with `Parrot` test doubles that automatically replay method interactions from verified files. This eliminates the need to write and maintain stub implementations entirely.
 
 Your current test probably looks something like this:
 
-### 🦜 Concept: Parrot
+### 🦜 Concept: Context.Parrot
 
-For the parrot to you will need a CallLog instead of the string writer:
-```csharp
-var callLog = CallLog.FromVerifiedFile();
-```
-
-Now instead of implementing stubs, you can let Parrot repla values from verified files:
+The Context can create Parrot test doubles that replay method interactions from verified files:
 
 ```csharp
-factory.SetOne(Parrot.Create<IBookingRepository>(callLog, "💾"));
-```
-
-You can add your own lines just as with the string writer:
-
-```csharp
-callLog.AppendLine(booking.ToString());
-```
-
-But you need to verify the result slightly differently: 
-
-```csharp
-await callLog.Verify();
+await context.Verify(async () => {
+    context.SetOne(context.Parrot<IBookingRepository>("💾"));
+    
+    // The Parrot will automatically replay interactions from the verified file
+    var coordinator = new BookingCoordinator();
+    return coordinator.BookFlight(/* parameters */).ToString();
+});
 ```
 
 Normally the first run throws a `ParrotMissingReturnValueException`. Fill in return values in the `.received.txt` file, rename to `.verified.txt`. Repeat until green.
 
-However, since you already have a verified call log with return values, the test should pass right away. 
+However, since you already have a verified call log with return values, the test should pass right away.
 
+### 🔗 Alternative: Context.Substitute
+
+Until now we have manually created and registered Parrots, but using `Context.Substitute()` you can let SpecRec handle that for you:
+
+```csharp
+await context.Verify(async () => {
+    context
+        .Substitute<IBookingRepository>("💾")
+        .Substitute<IFlightAvailabilityService>("✈️")
+        .Substitute<IPartnerNotifier>("📣");
+    
+    // Same functionality as Parrot, but with fluent API
+});
+```
+
+This syntax has cool side effect: instead of using the same Parrot over and over, `factory.Create` will create a new one every time with separate IDs. This syntax gives you the ability to keep track of multiple different objects of the same type. 
 
 ## 💎 Comprehensive scenario testing
 
@@ -185,7 +207,7 @@ Use `[SpecRecLogs]` to turn verified files into test cases:
 ```csharp
 [Theory]
 [SpecRecLogs]
-public async Task BookFlight_MultipleScenarios(CallLog callLog)
+public async Task BookFlight_MultipleScenarios(Context context)
 {
     // Same test setup for all scenarios
     // Each .verified.txt file becomes a separate test case
@@ -201,7 +223,7 @@ First, you need to add the parameters to your test:
 ```csharp
 [Theory]
 [SpecRecLogs]
-public async Task BookFlight_MultipleScenarios(CallLog callLog, string name = 'John Doe', int age = 42)
+public async Task BookFlight_MultipleScenarios(Context context, string name = 'John Doe', int age = 42)
 {
 
 }

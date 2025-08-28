@@ -53,7 +53,7 @@ namespace LegacyBookingCoordinator.Tests
             }
         }
     }
-
+    
     public class RandomStub : Random
     {
         public override int Next(int minValue, int maxValue)

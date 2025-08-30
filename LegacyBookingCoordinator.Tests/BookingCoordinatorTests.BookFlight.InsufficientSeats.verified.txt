@@ -1,9 +1,9 @@
 💾 IBookingRepository constructor called with:
-  🔸 dbConnectionString: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
+  🔸 dbConnectionString: "Server=production-db;Database=FlightBookings;Trusted_Connection=true;"
   🔸 maxRetries: 1
 
 ✈️ IFlightAvailabilityService constructor called with:
-  🔸 connectionString: Server=production-db;Database=FlightAvailability_AA;Trusted_Connection=true;
+  🔸 connectionString: "Server=production-db;Database=FlightAvailability_AA;Trusted_Connection=true;"
 
 ✈️ CheckAndGetAvailableSeatsForBooking:
   🔸 flightNumber: "AA123"

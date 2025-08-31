@@ -17,7 +17,7 @@ namespace LegacyBookingCoordinator.Tests
             string airlineCode = "AA",
             string specialRequests = "meal,wheelchair",
             DateTime? bookingDate = null
-            )
+        )
         {
             // Use default values if DateTime parameters are not set
             var actualDepartureDate = departureDate ?? new DateTime(2025, 07, 03, 12, 42, 11);
@@ -36,14 +36,6 @@ namespace LegacyBookingCoordinator.Tests
                 return coordinator.BookFlight(passengerName, flightNumber, actualDepartureDate,
                     passengerCount, airlineCode, specialRequests).ToString();
             });
-        }
-    }
-
-    public class RandomStub : Random
-    {
-        public override int Next(int minValue, int maxValue)
-        {
-            return 3;
         }
     }
 }

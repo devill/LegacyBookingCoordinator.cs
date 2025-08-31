@@ -24,7 +24,7 @@ namespace LegacyBookingCoordinator.Tests
                 context.SetOne(context.Parrot<IFlightAvailabilityService>("✈️"));
                 context.SetOne(context.Parrot<IPartnerNotifier>("📣"));
                 context.SetOne(context.Parrot<IAuditLogger>("🪵"));
-                context.SetOne<Random>(new RandomStub());
+                context.SetOne(context.Parrot<Random>("🎲"));
                 
                 var coordinator = new BookingCoordinator(bookingDate);
                 return coordinator.BookFlight(passengerName, flightNumber, departureDate,

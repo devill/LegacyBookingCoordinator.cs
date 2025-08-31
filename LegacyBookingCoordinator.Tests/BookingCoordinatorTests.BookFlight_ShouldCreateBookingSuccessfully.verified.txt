@@ -11,6 +11,11 @@
   🔸 passengerCount: 2
   🔹 Returns: ["11A","11B"]
 
+🎲 Next:
+  🔸 minValue: 0
+  🔸 maxValue: 5
+  🔹 Returns: 3
+
 📣 IPartnerNotifier constructor called with:
   🔸 smtpServer: "smtp.american.com"
   🔸 useEncryption: True

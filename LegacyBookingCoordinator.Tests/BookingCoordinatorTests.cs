@@ -24,22 +24,13 @@ namespace LegacyBookingCoordinator.Tests
                     .Substitute<IBookingRepository>("💾")
                     .Substitute<IFlightAvailabilityService>("✈️")
                     .Substitute<IPartnerNotifier>("📣")
-                    .Substitute<IAuditLogger>("🪵");
-                
-                context.SetOne<Random>(new RandomStub());
+                    .Substitute<IAuditLogger>("🪵")
+                    .Substitute<Random>("🎲");
                 
                 var coordinator = new BookingCoordinator(bookingDate);
                 return coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).ToString();
             });
-        }
-    }
-
-    public class RandomStub : Random
-    {
-        public override int Next(int minValue, int maxValue)
-        {
-            return 3;
         }
     }
 }

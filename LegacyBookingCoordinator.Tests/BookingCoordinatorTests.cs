@@ -25,11 +25,11 @@ namespace LegacyBookingCoordinator.Tests
                 .Substitute<IPartnerNotifier>("📣")
                 .Substitute<IAuditLogger>("🪵")
                 .Substitute<Random>("🎲")
-                .Verify(async () => {
-                    var coordinator = new BookingCoordinator(bookingDate);
-                    return coordinator.BookFlight(passengerName, flightNumber, departureDate,
-                        passengerCount, airlineCode, specialRequests).ToString();
-                });
+                .Verify(async () =>
+                    new BookingCoordinator(bookingDate).BookFlight(
+                        passengerName, flightNumber, departureDate,
+                        passengerCount, airlineCode, specialRequests
+                    ).ToString());
         }
     }
 }

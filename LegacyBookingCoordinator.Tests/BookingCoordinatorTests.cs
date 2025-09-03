@@ -19,14 +19,14 @@ namespace LegacyBookingCoordinator.Tests
             var specialRequests = "meal,wheelchair";
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
 
-            await context.Verify(async () => {
-                context
-                    .Substitute<IBookingRepository>("💾")
-                    .Substitute<IFlightAvailabilityService>("✈️")
-                    .Substitute<IPartnerNotifier>("📣")
-                    .Substitute<IAuditLogger>("🪵")
-                    .Substitute<Random>("🎲");
-                
+            await context
+                .Substitute<IBookingRepository>("💾")
+                .Substitute<IFlightAvailabilityService>("✈️")
+                .Substitute<IPartnerNotifier>("📣")
+                .Substitute<IAuditLogger>("🪵")
+                .Substitute<Random>("🎲")
+                .Verify(async () => {
+                    
                 var coordinator = new BookingCoordinator(bookingDate);
                 return coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).ToString();

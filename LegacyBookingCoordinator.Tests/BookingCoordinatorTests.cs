@@ -23,15 +23,14 @@ namespace LegacyBookingCoordinator.Tests
             var actualDepartureDate = departureDate ?? new DateTime(2025, 07, 03, 12, 42, 11);
             var actualBookingDate = bookingDate ?? new DateTime(2025, 03, 04, 14, 00, 56);
             
-            await context.Verify(async () =>
+            await context
+                .Substitute<IBookingRepository>("💾")
+                .Substitute<IFlightAvailabilityService>("✈️")
+                .Substitute<IPartnerNotifier>("📣")
+                .Substitute<IAuditLogger>("🪵")
+                .Substitute<Random>("🎲")
+                .Verify(async () =>
             {
-                context
-                    .Substitute<IBookingRepository>("💾")
-                    .Substitute<IFlightAvailabilityService>("✈️")
-                    .Substitute<IPartnerNotifier>("📣")
-                    .Substitute<IAuditLogger>("🪵")
-                    .Substitute<Random>("🎲");
-
                 var coordinator = new BookingCoordinator(actualBookingDate);
                 return coordinator.BookFlight(passengerName, flightNumber, actualDepartureDate,
                     passengerCount, airlineCode, specialRequests).ToString();

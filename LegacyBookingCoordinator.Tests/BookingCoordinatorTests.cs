@@ -29,8 +29,7 @@ namespace LegacyBookingCoordinator.Tests
                 .Substitute<IPartnerNotifier>("📣")
                 .Substitute<IAuditLogger>("🪵")
                 .Substitute<Random>("🎲")
-                .Verify(async () =>
-                {
+                .Verify(async () => {
                     var coordinator = new BookingCoordinator(actualBookingDate);
                     return coordinator.BookFlight(passengerName, flightNumber, actualDepartureDate,
                         passengerCount, airlineCode, specialRequests).ToString();

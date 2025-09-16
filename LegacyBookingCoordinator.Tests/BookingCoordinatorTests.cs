@@ -4,8 +4,9 @@ namespace LegacyBookingCoordinator.Tests
 {
     public class BookingCoordinatorTests
     {
-        [Fact]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully()
+        [Theory]
+        [SpecRecLogs]
+        public async Task BookFlight_ShouldCreateBookingSuccessfully(Context context)
         {
             // Arrange
             var passengerName = "John Doe";
@@ -16,26 +17,17 @@ namespace LegacyBookingCoordinator.Tests
             var specialRequests = "meal,wheelchair";
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
 
-            var factory = ObjectFactory.Instance();
-            try
-            {
-                factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
-                factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
-                factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
-                factory.SetOne<IAuditLogger>(new AuditLoggerStub());
-                factory.SetOne<Random>(new RandomStub());
-
-                var result = new BookingCoordinator(bookingDate).BookFlight(
-                    passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests
-                );
-
-                await Verify(result.ToString());
-            }
-            finally
-            {
-                factory.ClearAll();
-            }
+            await context.Verify(async () => {
+                context.SetOne<IBookingRepository>(new BookingRepositoryStub());
+                context.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
+                context.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
+                context.SetOne<IAuditLogger>(new AuditLoggerStub());
+                context.SetOne<Random>(new RandomStub());
+                
+                var coordinator = new BookingCoordinator(bookingDate);
+                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests).ToString();
+            });
         }
     }
     

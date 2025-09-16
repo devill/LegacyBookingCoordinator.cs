@@ -1,5 +1,3 @@
-using System.CodeDom;
-using System.Text;
 using SpecRec;
 
 namespace LegacyBookingCoordinator.Tests

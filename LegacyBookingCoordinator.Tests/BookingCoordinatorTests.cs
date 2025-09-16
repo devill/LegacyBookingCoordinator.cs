@@ -1,14 +1,11 @@
-using System.CodeDom;
-using System.Text;
 using SpecRec;
 
 namespace LegacyBookingCoordinator.Tests
 {
     public class BookingCoordinatorTests
     {
-        [Theory]
-        [SpecRecLogs]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully(Context context)
+        [Fact]
+        public async Task BookFlight_ShouldCreateBookingSuccessfully()
         {
             // Arrange
             var passengerName = "John Doe";
@@ -19,20 +16,22 @@ namespace LegacyBookingCoordinator.Tests
             var specialRequests = "meal,wheelchair";
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
 
-            await context.Verify(async () => {
-                context.SetOne<IBookingRepository>(new BookingRepositoryStub());
-                context.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
-                context.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
-                context.SetOne<IAuditLogger>(new AuditLoggerStub());
-                context.SetOne<Random>(new RandomStub());
-                
-                var coordinator = new BookingCoordinator(bookingDate);
-                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests).ToString();
-            });  
+            var factory = ObjectFactory.Instance();
+            factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
+            factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
+            factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
+            factory.SetOne<IAuditLogger>(new AuditLoggerStub());
+            factory.SetOne<Random>(new RandomStub());
+            
+            var result = new BookingCoordinator(bookingDate).BookFlight(
+                passengerName, flightNumber, departureDate,
+                passengerCount, airlineCode, specialRequests
+            );
+
+            await Verify(result.ToString());
         }
     }
-
+    
     public class AuditLoggerStub : IAuditLogger
     {
         public void LogBookingActivity(string activity, string bookingReference, string userInfo)

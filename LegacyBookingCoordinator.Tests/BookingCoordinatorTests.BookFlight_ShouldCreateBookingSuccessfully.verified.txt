@@ -1,4 +1,4 @@
-﻿Returns: "New booking: APPLE3.14
+﻿New booking: APPLE3.14
   👤 John Doe
   ✈️ AA123
   📅 2025-07-03 12:42
@@ -7,4 +7,4 @@
   💰 $1161,37
   🎯 meal,wheelchair
   📝 2025-03-04 14:00
-  ✅ CONFIRMED_PREMIUM"
+  ✅ CONFIRMED_PREMIUM

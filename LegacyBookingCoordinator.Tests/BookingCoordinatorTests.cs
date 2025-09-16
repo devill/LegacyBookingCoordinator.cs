@@ -1,5 +1,3 @@
-using System.CodeDom;
-using System.Text;
 using SpecRec;
 
 namespace LegacyBookingCoordinator.Tests
@@ -29,7 +27,7 @@ namespace LegacyBookingCoordinator.Tests
                 var coordinator = new BookingCoordinator(bookingDate);
                 return coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).ToString();
-            });  
+            });
         }
     }
 }

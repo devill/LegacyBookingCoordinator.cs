@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-      <PackageReference Include="SpecRec" Version="2.1.0" />
+        <PackageReference Include="SpecRec" Version="2.2.5" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -10,5 +10,5 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
+    
 </Project>

@@ -17,18 +17,25 @@ namespace LegacyBookingCoordinator.Tests
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
 
             var factory = ObjectFactory.Instance();
-            factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
-            factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
-            factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
-            factory.SetOne<IAuditLogger>(new AuditLoggerStub());
-            factory.SetOne<Random>(new RandomStub());
-            
-            var result = new BookingCoordinator(bookingDate).BookFlight(
-                passengerName, flightNumber, departureDate,
-                passengerCount, airlineCode, specialRequests
-            );
+            try
+            {
+                factory.SetOne<IBookingRepository>(new BookingRepositoryStub());
+                factory.SetOne<IFlightAvailabilityService>(new FlightAvailabilityServiceStub());
+                factory.SetOne<IPartnerNotifier>(new PartnerNotifierStub());
+                factory.SetOne<IAuditLogger>(new AuditLoggerStub());
+                factory.SetOne<Random>(new RandomStub());
 
-            await Verify(result.ToString());
+                var result = new BookingCoordinator(bookingDate).BookFlight(
+                    passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests
+                );
+
+                await Verify(result.ToString());
+            }
+            finally
+            {
+                factory.ClearAll();
+            }
         }
     }
     

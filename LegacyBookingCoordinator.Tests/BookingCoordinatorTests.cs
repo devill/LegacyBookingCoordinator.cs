@@ -6,9 +6,8 @@ namespace LegacyBookingCoordinator.Tests
 {
     public class BookingCoordinatorTests
     {
-        [Theory]
-        [SpecRecLogs]
-        public async Task BookFlight_ShouldCreateBookingSuccessfully(Context context)
+        [Fact]
+        public void BookFlight_ShouldCreateBookingSuccessfully()
         {
             // Arrange
             var passengerName = "John Doe";
@@ -17,12 +16,13 @@ namespace LegacyBookingCoordinator.Tests
             var passengerCount = 2;
             var airlineCode = "AA";
             var specialRequests = "meal,wheelchair";
+            
+            var result = new BookingCoordinator().BookFlight(
+                passengerName, flightNumber, departureDate,
+                passengerCount, airlineCode, specialRequests
+            );
 
-            await context.Verify(async () => {
-                var coordinator = new BookingCoordinator();
-                return coordinator.BookFlight(passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests).ToString();
-            }, exceptions: ExceptionHandling.PassThrough);  
+            Verify(result.ToString());
         }
     }
 }

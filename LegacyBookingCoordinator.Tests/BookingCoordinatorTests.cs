@@ -7,7 +7,7 @@ namespace LegacyBookingCoordinator.Tests
     public class BookingCoordinatorTests
     {
         [Fact]
-        public void BookFlight_ShouldCreateBookingSuccessfully()
+        public async Task BookFlight_ShouldCreateBookingSuccessfully()
         {
             // Arrange
             var passengerName = "John Doe";
@@ -22,7 +22,7 @@ namespace LegacyBookingCoordinator.Tests
                 passengerCount, airlineCode, specialRequests
             );
 
-            Verify(result.ToString());
+            await Verify(result.ToString());
         }
     }
 }

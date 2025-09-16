@@ -29,7 +29,7 @@ namespace LegacyBookingCoordinator.Tests
                 var coordinator = new BookingCoordinator(bookingDate);
                 return coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).ToString();
-            });
+            });  
         }
     }
 

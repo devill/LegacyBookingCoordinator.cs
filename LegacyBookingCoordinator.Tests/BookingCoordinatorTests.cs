@@ -1,4 +1,5 @@
 using SpecRec;
+using ObjectFactory;
 
 namespace LegacyBookingCoordinator.Tests
 {

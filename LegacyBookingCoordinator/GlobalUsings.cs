@@ -1,1 +1,1 @@
-global using static SpecRec.GlobalObjectFactory;
+global using static ObjectFactory.GlobalObjectFactory;

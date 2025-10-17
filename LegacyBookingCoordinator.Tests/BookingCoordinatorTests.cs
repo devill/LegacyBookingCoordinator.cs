@@ -1,4 +1,5 @@
 using SpecRec;
+using ObjectFactory;
 
 namespace LegacyBookingCoordinator.Tests
 {
@@ -23,7 +24,7 @@ namespace LegacyBookingCoordinator.Tests
                 context.SetOne(context.Parrot<IPartnerNotifier>("📣"));
                 context.SetOne(context.Parrot<IAuditLogger>("🪵"));
                 context.SetOne(context.Parrot<Random>("🎲"));
-                
+
                 var coordinator = new BookingCoordinator(bookingDate);
                 return coordinator.BookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).ToString();

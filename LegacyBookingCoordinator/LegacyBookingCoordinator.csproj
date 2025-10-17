@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <PackageReference Include="SpecRec" Version="2.2.5" />
+        <PackageReference Include="ObjectFactory" Version="1.0.0" />
+        <PackageReference Include="SpecRec" Version="3.0.0" />
     </ItemGroup>
 
     <PropertyGroup>

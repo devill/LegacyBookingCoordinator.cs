@@ -1,4 +1,5 @@
 using SpecRec;
+using ObjectFactory;
 
 namespace LegacyBookingCoordinator.Tests
 {
@@ -16,7 +17,7 @@ namespace LegacyBookingCoordinator.Tests
             var specialRequests = "meal,wheelchair";
             var bookingDate = new DateTime(2025, 03, 04, 14, 00, 56);
 
-            var factory = ObjectFactory.Instance();
+            var factory = ObjectFactory.ObjectFactory.Instance();
             try
             {
                 factory.SetOne<IBookingRepository>(new BookingRepositoryStub());

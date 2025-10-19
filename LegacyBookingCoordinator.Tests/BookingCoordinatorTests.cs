@@ -42,7 +42,7 @@ namespace LegacyBookingCoordinator.Tests
     
     public class AuditLoggerStub : IAuditLogger
     {
-        public void LogBookingActivity(string activity, string bookingReference, string userInfo)
+        public void LogBookingActivity(string activity, string userInfo)
         {
         }
 

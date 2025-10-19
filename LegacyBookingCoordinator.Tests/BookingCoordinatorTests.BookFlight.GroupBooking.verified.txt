@@ -23,10 +23,6 @@
   🔸 smtpServer: "smtp.american.com"
   🔸 useEncryption: True
 
-🪵 IAuditLogger constructor called with:
-  🔸 logDirectory: "C:\Logs\BookingLogs\LowVolume"
-  🔸 verboseMode: False
-
 💾 SaveBookingDetails:
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "AA123 on 2025-07-03 for 6 passengers"
@@ -34,9 +30,13 @@
   🔸 bookingDate: 2025-03-04 14:00:56
   🔹 Returns: "AA1230002JOH"
 
+🪵 IAuditLogger constructor called with:
+  🔸 actualBookingRef: "AA1230002JOH"
+  🔸 logDirectory: "C:\Logs\BookingLogs\LowVolume"
+  🔸 verboseMode: False
+
 🪵 LogBookingActivity:
   🔸 activity: "Flight Booked"
-  🔸 bookingReference: "AA1230002JOH"
   🔸 userInfo: "Passenger: John Doe, Flight: AA123"
 
 🪵 RecordPricingCalculation:

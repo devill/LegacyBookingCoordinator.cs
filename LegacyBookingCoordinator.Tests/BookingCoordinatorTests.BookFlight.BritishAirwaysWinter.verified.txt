@@ -25,10 +25,6 @@
   🔸 smtpServer: "smtp.britishairways.com"
   🔸 useEncryption: True
 
-🪵 IAuditLogger constructor called with:
-  🔸 logDirectory: "C:\Logs\BookingLogs\LowVolume"
-  🔸 verboseMode: False
-
 💾 SaveBookingDetails:
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "BA789 on 2025-12-20 for 2 passengers"
@@ -36,9 +32,13 @@
   🔸 bookingDate: 2025-03-04 14:00:56
   🔹 Returns: "BA7890002JOH"
 
+🪵 IAuditLogger constructor called with:
+  🔸 actualBookingRef: "BA7890002JOH"
+  🔸 logDirectory: "C:\Logs\BookingLogs\LowVolume"
+  🔸 verboseMode: False
+
 🪵 LogBookingActivity:
   🔸 activity: "Flight Booked"
-  🔸 bookingReference: "BA7890002JOH"
   🔸 userInfo: "Passenger: John Doe, Flight: BA789"
 
 🪵 RecordPricingCalculation:

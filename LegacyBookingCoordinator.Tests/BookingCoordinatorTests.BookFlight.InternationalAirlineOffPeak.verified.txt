@@ -25,10 +25,6 @@
   🔸 smtpServer: "smtp.generic-airline.com"
   🔸 useEncryption: True
 
-🪵 IAuditLogger constructor called with:
-  🔸 logDirectory: "C:\Logs\BookingLogs\LowVolume"
-  🔸 verboseMode: False
-
 💾 SaveBookingDetails:
   🔸 passengerName: "John Doe"
   🔸 flightDetails: "LH234 on 2025-04-15 for 2 passengers"
@@ -36,9 +32,13 @@
   🔸 bookingDate: 2025-03-04 14:00:56
   🔹 Returns: "LH2340002JOH"
 
+🪵 IAuditLogger constructor called with:
+  🔸 actualBookingRef: "LH2340002JOH"
+  🔸 logDirectory: "C:\Logs\BookingLogs\LowVolume"
+  🔸 verboseMode: False
+
 🪵 LogBookingActivity:
   🔸 activity: "Flight Booked"
-  🔸 bookingReference: "LH2340002JOH"
   🔸 userInfo: "Passenger: John Doe, Flight: LH234"
 
 🪵 RecordPricingCalculation:

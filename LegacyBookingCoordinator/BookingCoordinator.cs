@@ -115,8 +115,7 @@ namespace LegacyBookingCoordinator
             // Setup audit logging with dynamic configuration
             var logDirectory = CalculateLogDirectoryFromBookingCount();
             var verboseMode = temporaryData.ContainsKey("debugMode"); // Enable verbose mode if debug flag set
-            var auditLogger = new AuditLogger(logDirectory, verboseMode);
-
+            
             // Generate unique booking reference
             var bookingReference = GenerateBookingReferenceAndUpdateCounters(passengerName, flightNumber);
             lastBookingRef = bookingReference; // Store for debugging and error tracking
@@ -126,8 +125,10 @@ namespace LegacyBookingCoordinator
                 $"{flightNumber} on {departureDate:yyyy-MM-dd} for {passengerCount} passengers",
                 finalPrice, DateTime.Now);
 
+            var auditLogger = new AuditLogger(actualBookingRef, logDirectory, verboseMode);
+            
             // Log the booking activity
-            auditLogger.LogBookingActivity("Flight Booked", actualBookingRef,
+            auditLogger.LogBookingActivity("Flight Booked",
                 $"Passenger: {passengerName}, Flight: {flightNumber}");
 
             auditLogger.RecordPricingCalculation(
